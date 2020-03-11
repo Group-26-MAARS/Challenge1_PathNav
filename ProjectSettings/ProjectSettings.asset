@@ -932,10 +932,10 @@ PlayerSettings:
   facebookXfbml: 0
   facebookFrictionlessRequests: 1
   apiCompatibilityLevel: 3
-  cloudProjectId: 
+  cloudProjectId: 346b59cc-41c5-45e3-a4b2-d99b05821d6b
   framebufferDepthMemorylessMode: 0
-  projectName: 
-  organizationId: 
+  projectName: HelloAR U3D (1)
+  organizationId: dtroberts
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
