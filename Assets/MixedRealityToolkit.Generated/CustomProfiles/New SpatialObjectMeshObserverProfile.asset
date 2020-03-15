@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isCustomProfile: 1
   startupBehavior: 0
-  isStationaryObserver: 0
+  isStationaryObserver: 1
   observationExtents: {x: 3, y: 3, z: 3}
   observerVolumeType: 1
   updateInterval: 3.5
