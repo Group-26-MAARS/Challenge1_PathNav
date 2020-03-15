@@ -11,7 +11,7 @@ public class NavMeshGen : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       // StartCoroutine(buildNav());
+        StartCoroutine(buildNav());
     }
 
     // Update is called once per frame
@@ -29,8 +29,6 @@ public class NavMeshGen : MonoBehaviour
     {
         while (true)
         {
-            Debug.Log("Prior to buildig Navmesh");
-
             yield return new WaitForSeconds(Convert.ToSingle(1.5)); // approx 1.5s
 
             surface.BuildNavMesh();

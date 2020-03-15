@@ -1140,7 +1140,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ece2e4b779c2f1e49a7c8223f53eaa2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  goal: {fileID: 2061699757}
+  goalFromUnity: {fileID: 2061699757}
   initial: {fileID: 114926297}
 --- !u!1 &494023660
 GameObject:

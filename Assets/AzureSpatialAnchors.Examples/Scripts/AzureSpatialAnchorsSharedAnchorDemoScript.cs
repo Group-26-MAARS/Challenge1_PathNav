@@ -122,6 +122,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
                     GameObject nextObject = SpawnNewAnchoredObject(anchorPose.position, anchorPose.rotation, currentCloudAnchor);
+                    
+                    // Here is where I need to call a method of class MoveTo to set destination
+                    MoveTo.setGoal(nextObject.transform);
+
+                    //
                     spawnedObjectMat = nextObject.GetComponent<MeshRenderer>().material;
                     AttachTextMesh(nextObject, _anchorNumberToFind);
                     otherSpawnedObjects.Add(nextObject);
