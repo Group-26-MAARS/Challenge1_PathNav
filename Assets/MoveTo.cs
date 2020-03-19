@@ -14,24 +14,30 @@ public class MoveTo : MonoBehaviour
     void Start()
     {
         NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        Debug.Log("NavMesh agent is created");
+
         //goal = goalFromUnity; // This needs to be changed and use config file
         // Not necessary to set agent's destination here since it is set in Update()
     }
-    public static void setGoal(Transform newGoal)
+    public void setGoal(Transform newGoal)
     {
         goal = newGoal; // From newly located spatial anchor.
         Debug.Log("goal is set");
-
     }
 
     void Update()
     {
         //transform.LookAt(goal);
 
-        var offset = transform.position - goal.transform.position; // Look at destination
-        transform.LookAt(transform.position + offset);
+        if ((transform != null) && (goal != null))
+        {
+            var offset = transform.position - goal.transform.position; // Look at destination
+            transform.LookAt(transform.position + offset);
+        }
 
-                GameObject usersGameObj;
+
+        GameObject usersGameObj;
+
         if (goal != null)
         {
             NavMeshAgent agent = GetComponent<NavMeshAgent>();
