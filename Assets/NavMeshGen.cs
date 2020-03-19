@@ -6,7 +6,6 @@ using UnityEngine.AI;
 public class NavMeshGen : MonoBehaviour
 {
     public NavMeshSurface surface;
-    public GameObject mixedRealityPlaySpace;
     private bool navMeshIsCreated = false;
     // Start is called before the first frame update
     void Start()
@@ -22,14 +21,16 @@ public class NavMeshGen : MonoBehaviour
         {
             surface.BuildNavMesh();
             navMeshIsCreated = true;
+            Debug.Log("Building Navmesh first time");
+
         }
-        
+
     }
     IEnumerator buildNav()
     {
         while (true)
         {
-            yield return new WaitForSeconds(Convert.ToSingle(1.5)); // approx 1.5s
+            yield return new WaitForSeconds(Convert.ToSingle(5.0)); // approx 1.5s
 
             surface.BuildNavMesh();
             Debug.Log("Rebulding Navmesh");

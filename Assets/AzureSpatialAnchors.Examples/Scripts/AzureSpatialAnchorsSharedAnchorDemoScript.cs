@@ -75,7 +75,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         #region Unity Inspector Variables
         [SerializeField]
         [Tooltip("The base URL for the example sharing service.")]
-        private string baseSharingUrl = "";
+        private string baseSharingUrl = "https://sharingservice20200308094713.azurewebsites.net";
         #endregion // Unity Inspector Variables
 
         private AppState currentAppState
@@ -122,12 +122,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
                     GameObject nextObject = SpawnNewAnchoredObject(anchorPose.position, anchorPose.rotation, currentCloudAnchor);
-                    
-                    // Here is where I need to call a method of class MoveTo to set destination
-                    MoveTo.setGoal(nextObject.transform);
+                    //spawnedObjectMat = nextObject.GetComponent<MeshRenderer>().material;
+                    Debug.Log("Setting goal in shareddemo");
 
-                    //
-                    spawnedObjectMat = nextObject.GetComponent<MeshRenderer>().material;
+                    MoveTo.setGoal(nextObject.transform);
                     AttachTextMesh(nextObject, _anchorNumberToFind);
                     otherSpawnedObjects.Add(nextObject);
 

@@ -496,7 +496,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             newGameObject.AddComponent<CloudNativeAnchor>();
 
             // Set the color
-            newGameObject.GetComponent<MeshRenderer>().material.color = GetStepColor();
+            //newGameObject.GetComponent<MeshRenderer>().material.color = GetStepColor();
 
             // Return created object
             return newGameObject;
@@ -522,7 +522,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
 
             // Set color
-            newGameObject.GetComponent<MeshRenderer>().material.color = GetStepColor();
+            //newGameObject.GetComponent<MeshRenderer>().material.color = GetStepColor();
 
             // Return newly created object
             return newGameObject;
