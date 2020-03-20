@@ -19,10 +19,12 @@ public class MoveTo : MonoBehaviour
         //goal = goalFromUnity; // This needs to be changed and use config file
         // Not necessary to set agent's destination here since it is set in Update()
     }
-    public void setGoal(Transform newGoal)
+    public void setGoal(Transform newGoal, string gameObjectName)
     {
+        if (!gameObjectName.Equals(""))
+            Debug.Log("goal is set for " + gameObjectName);
+
         goal = newGoal; // From newly located spatial anchor.
-        Debug.Log("goal is set");
     }
 
     void Update()
@@ -58,8 +60,6 @@ public class MoveTo : MonoBehaviour
                             else
                             {
                                 Transform myRealPosition = usersGameObj.transform;
-                            //agent.transform.position = mainCamera.transform.position;
-
                                 agent.transform.position = myRealPosition.position;
                                 Debug.Log("new position" + myRealPosition.position);
                                 agent.destination = goal.position;
@@ -69,7 +69,7 @@ public class MoveTo : MonoBehaviour
                     }
                 }
             }
-            else
+            else // If not on navmesh, just update the agent's position to the camera's new position and try again. 
             {
                 Debug.Log("Agent is not on nav mesh (in update)");
                 // Jump back to camera and try to get back on nav mesh
@@ -81,7 +81,6 @@ public class MoveTo : MonoBehaviour
                 else
                 {
                     Transform myRealPosition = usersGameObj.transform;
-
                     agent.transform.position = myRealPosition.position;
                     Debug.Log("new position" + myRealPosition.position);
                 }

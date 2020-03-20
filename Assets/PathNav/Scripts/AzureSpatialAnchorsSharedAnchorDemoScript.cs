@@ -129,7 +129,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     Debug.Log("Setting goal in shareddemo");
 
                     //MoveTo.setGoal(nextObject.transform);
-                    GameObject.Find("arrow").GetComponent<moveTo>().setGoal(nextObject.transform);
+                    GameObject.Find("arrow").GetComponent<moveTo>().setGoal(nextObject.transform, nextObject.name);
 
 
                     AttachTextMesh(nextObject, _anchorNumberToFind);

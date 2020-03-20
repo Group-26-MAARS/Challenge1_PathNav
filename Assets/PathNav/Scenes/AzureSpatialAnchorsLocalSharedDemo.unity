@@ -107,7 +107,7 @@ NavMeshSettings:
     agentTypeID: 0
     agentRadius: 0.4
     agentHeight: 1.8
-    agentSlope: 45
+    agentSlope: 55.2
     agentClimb: 0.9
     ledgeDropHeight: 0
     maxJumpAcrossDistance: 0
@@ -1014,7 +1014,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.2
-  m_Speed: 0.5
+  m_Speed: 1
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -3179,7 +3179,7 @@ GameObject:
   - component: {fileID: 1628911485}
   - component: {fileID: 1628911484}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: listOfFlagsGameObj
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3197,7 +3197,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 804eb99d2d85e6c4290130c27f89c3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flags: []
 --- !u!4 &1628911485
 Transform:
   m_ObjectHideFlags: 0
@@ -3206,7 +3205,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1628911483}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.58179665, y: 1.9142057, z: -1.6733801}
+  m_LocalPosition: {x: 1.829, y: 1.9142057, z: -1.6733801}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -3588,6 +3587,18 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 567398703}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1902719222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1902719219}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbfc4568ad11043478e8d944e1fe83e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1943817565
 PrefabInstance:
   m_ObjectHideFlags: 0
