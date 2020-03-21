@@ -11,21 +11,26 @@ public class CaptureDistance : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // Comment this out when using on real device
+        beginNavigation();
+    }
+
+    void beginNavigation() // Called either from Start (if just using Unity) or from UI button
+    {
         if (initialGoalIsSet == false)
         {
             if ((GameObject.Find("arrow").GetComponent<moveTo>() == null) || (GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>() == null))
             {
-                print("moveTo is null in Capture Distance");
+                print("arrow or flag list are null in Capture Distance");
                 return;
             }
-            else
+            else // Otherwise, get first flag from the list and set it as destination
             {
                 GameObject myGameObject = GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().getNext();
                 GameObject.Find("arrow").GetComponent<moveTo>().setGoal(myGameObject.transform, myGameObject.name);
 
             }
         }
-
     }
 
     // Update is called once per frame
@@ -36,7 +41,7 @@ public class CaptureDistance : MonoBehaviour
         {
             float dist = Vector3.Distance(MoveTo.goal.transform.position, transform.position);
             //print("Distance to goal: " + dist);
-            
+
             if (dist < 1.5) // Made it to current goal. Update Goal
             {
                 //GameObject.Find("arrow").GetComponent<moveTo>().setGoal(ListOps.getNext().transform);
@@ -49,6 +54,8 @@ public class CaptureDistance : MonoBehaviour
                     // Remove Arrow
                     Destroy(GameObject.Find("arrow"));
                     print("All goals have been reached in Path Navigation!");
+
+                    // This is when next phase of Challenge 1 needs to be called
                 }
                 //moveTo.goal = ListOps.getNext().transform;
                 print("Distance is " + dist + ". Updating goal!");

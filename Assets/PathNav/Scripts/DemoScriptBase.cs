@@ -97,11 +97,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
             if (AnchoredObjectPrefab == null)
             {
-                feedbackBox.text = "CreationTarget must be set on the demo script.";
+                feedbackBox.text = "AnchoredObjectPrefab is null in script base";
                 return;
             }
 
-            CloudManager.SessionUpdated += CloudManager_SessionUpdated;
+            CloudManager.SessionUpdated += CloudManager_SessionUpdated; // The method this event is binded to is not implemented in base class or SharedScript
             CloudManager.AnchorLocated += CloudManager_AnchorLocated;
             CloudManager.LocateAnchorsCompleted += CloudManager_LocateAnchorsCompleted;
             CloudManager.LogDebug += CloudManager_LogDebug;

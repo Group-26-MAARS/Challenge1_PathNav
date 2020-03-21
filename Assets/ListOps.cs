@@ -9,7 +9,7 @@ public class ListOps : MonoBehaviour
 {
     //public GameObject[] flags;
 
-    public static List<GameObject> flags;
+    public List<GameObject> flags;
     bool itemsAdded;
     int currentFlagNbr;
 
@@ -26,6 +26,10 @@ public class ListOps : MonoBehaviour
 
         // Load actual flag game objects into flags
 
+        // THIS WILL FAIL IF the first one isn't found!!!
+
+        // Comment this out when using on real device.
+        /*********************************************************************/
         // Initialize flags
         int i = 0;
         GameObject currentFlag = GameObject.Find("flagAndPoleNbr" + i);
@@ -33,15 +37,22 @@ public class ListOps : MonoBehaviour
             Debug.Log("current is null!! unable to find future game objects or add them to list");
         else
             Debug.Log("current flag is" + currentFlag.name);
-
-        // THIS WILL FAIL IF the first one isn't found!!!
-
         while (currentFlag != null)
         {
             Debug.Log("adding" + currentFlag.name);
-            flags.Add(currentFlag);
+            addFlag(currentFlag);
             i++;
             currentFlag = GameObject.Find("flagAndPoleNbr" + i);
+        }
+        /**********************************************************************/
+    }
+    public void addFlag(GameObject newFlag)
+    {
+        if (newFlag != null)
+        {
+            flags.Add(newFlag);
+            Debug.Log("added" + newFlag.name + ". Size is now" + flags.Count);
+
         }
     }
     public GameObject getNext()
