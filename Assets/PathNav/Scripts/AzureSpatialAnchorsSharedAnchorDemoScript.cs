@@ -380,7 +380,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 else
                 {
                     // _anchorNumberToFind = anchorNumber;
-#if !UNITY_EDITOR
                     // This is where I need to change _anchorKeyToFind to a list and cycle through all rowKeys (of interest. Statically set for now) and add them to _anchorKeyToFindList
                     // For now it will ignore user's actual input
                     _anchorNumberToFind = new List<long?>();
@@ -393,12 +392,15 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     for (int i = 0; i < 3; i++)
                     {
                         // Add anchor keys
+#if !UNITY_EDITOR
+
                         string currentAnchorKey = await anchorExchanger.RetrieveAnchorKey((long)_anchorNumberToFind[i]);
                         _anchorKeyToFind.Add(currentAnchorKey);
+#endif
+
                     }
 
                     //_anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(_anchorNumberToFind.Value);
-#endif
                     if (_anchorKeyToFind == null)
                     {
                         feedbackBox.text = "Anchor Number Not Found!";
