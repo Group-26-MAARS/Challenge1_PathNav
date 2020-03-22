@@ -1038,6 +1038,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: flagAndPoleNbr1
       objectReference: {fileID: 0}
+    - target: {fileID: 1401511626218527236, guid: f69e708a6c60f6345858ab01b0407c82,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1401511626218527244, guid: f69e708a6c60f6345858ab01b0407c82,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2311,6 +2316,11 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: -927199367670048503, guid: dd292e9616b70c541b4fc853593280e4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2534866581884222612, guid: dd292e9616b70c541b4fc853593280e4,
         type: 3}
       propertyPath: m_Layer
@@ -2766,6 +2776,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: flagAndPoleNbr0
       objectReference: {fileID: 0}
+    - target: {fileID: 1401511626218527236, guid: f69e708a6c60f6345858ab01b0407c82,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1401511626218527244, guid: f69e708a6c60f6345858ab01b0407c82,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3197,6 +3212,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 804eb99d2d85e6c4290130c27f89c3d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flags: []
 --- !u!4 &1628911485
 Transform:
   m_ObjectHideFlags: 0
@@ -3452,6 +3468,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: flagAndPoleNbr2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1401511626218527236, guid: f69e708a6c60f6345858ab01b0407c82,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1401511626218527244, guid: f69e708a6c60f6345858ab01b0407c82,
         type: 3}

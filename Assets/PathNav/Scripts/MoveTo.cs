@@ -33,6 +33,7 @@ public class MoveTo : MonoBehaviour
 
         if ((transform != null) && (goal != null))
         {
+            //var offset = transform.position - goal.transform.position; // Look at destination
             var offset = transform.position - goal.transform.position; // Look at destination
             transform.LookAt(transform.position + offset);
         }
@@ -54,12 +55,13 @@ public class MoveTo : MonoBehaviour
                         {
                             // Done
                             //Debug.Log("navigation complete");
-                            usersGameObj = mainCamera;
-                            if (usersGameObj == null)
+                            //usersGameObj = mainCamera;
+                            //usersGameObj = Camera.main.transform.position;
+                            if (Camera.main == null)
                                 Debug.Log("usersGameObj is null");
                             else
                             {
-                                Transform myRealPosition = usersGameObj.transform;
+                                Transform myRealPosition = Camera.main.transform;
                                 agent.transform.position = myRealPosition.position;
                                 Debug.Log("new position" + myRealPosition.position);
                                 agent.destination = goal.position;
@@ -75,14 +77,14 @@ public class MoveTo : MonoBehaviour
                 // Jump back to camera and try to get back on nav mesh
                 // Done
                 //Debug.Log("navigation complete");
-                usersGameObj = mainCamera;
-                if (usersGameObj == null)
+                //usersGameObj = Camera.main.transform.position;
+                if (Camera.main == null)
                     Debug.Log("usersGameObj is null");
                 else
                 {
-                    Transform myRealPosition = usersGameObj.transform;
+                    Transform myRealPosition = Camera.main.transform;
                     agent.transform.position = myRealPosition.position;
-                    Debug.Log("new position" + myRealPosition.position);
+                //    Debug.Log("new position" + myRealPosition.position);
                 }
             }
         }

@@ -56,8 +56,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             { AppState.DemoStepStartSessionForQuery,new DemoStepParams() { StepMessage = "Next: Start CloudSpatialAnchorSession for query", StepColor = Color.clear }},
             { AppState.DemoStepLookForAnchor,new DemoStepParams() { StepMessage = "Next: Look for anchor", StepColor = Color.clear }},
             { AppState.DemoStepLookingForAnchor,new DemoStepParams() { StepMessage = "Looking for anchor...", StepColor = Color.clear }},
-            //{ AppState.DemoStepStopSessionForQuery,new DemoStepParams() { StepMessage = "Next: Stop CloudSpatialAnchorSession for query", StepColor = Color.yellow }},
-            { AppState.DemoStepStopSessionForQuery,new DemoStepParams() { StepMessage = "Anchor has been added to List for navigation. Count is now " + GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().flags.Count, StepColor = Color.yellow }},
+            { AppState.DemoStepStopSessionForQuery,new DemoStepParams() { StepMessage = "Next: Stop CloudSpatialAnchorSession for query", StepColor = Color.yellow }},
+            //{ AppState.DemoStepStopSessionForQuery,new DemoStepParams() { StepMessage = "Anchor has been added to List for navigation. Count is now " + GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().flags.Count, StepColor = Color.yellow }},
             { AppState.DemoStepComplete,new DemoStepParams() { StepMessage = "Next: Restart demo", StepColor = Color.clear }}
         };
 
@@ -72,8 +72,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         private int anchorsLocated = 0;
         private int anchorsExpected = 0;
         private readonly List<string> localAnchorIds = new List<string>();
-        private string _anchorKeyToFind = null;
-        private long? _anchorNumberToFind;
+        //private string _anchorKeyToFind = null;
+        private List<string> _anchorKeyToFind = null;
+        //private long? _anchorNumberToFind;
+        private List<long?> _anchorNumberToFind = null;
+        bool navigationStarted = false;
+
         #endregion // Member Variables
 
         #region Unity Inspector Variables
@@ -133,13 +137,23 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
 
                     // Uncomment out the following when using on real device
-                    /********************************************************************************************
-                    // Instead of setting anchor is up as destination, add the game object to the flag list for later use
+                    //********************************************************************************************
+                    //Instead of setting anchor is up as destination, add the game object to the flag list for later use
                    GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().addFlag(nextObject);
+                    Debug.Log("********************************************added next Object: " + nextObject.transform.position + ". Main camera's location is " + Camera.main.transform.position + ". other position is " + GameObject.Find("CameraParent").transform.position);
 
-                    ********************************************************************************************/
+                    // Only start navigation if there are destination flags
+                    if ((navigationStarted == false) && (GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().flags.Count > 0))
+                    {
+                        GameObject.Find("CameraParent").GetComponent<CaptureDistance>().beginNavigation();
+                        navigationStarted = true;
+                    }
 
-                    AttachTextMesh(nextObject, _anchorNumberToFind);
+                    //********************************************************************************************
+
+                    //      AttachTextMesh(nextObject, _anchorNumberToFind);
+
+
                     otherSpawnedObjects.Add(nextObject);
 
                     if (anchorsLocated >= anchorsExpected)
@@ -365,12 +379,26 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
                 else
                 {
-                    _anchorNumberToFind = anchorNumber;
-                    #if !UNITY_EDITOR
+                    // _anchorNumberToFind = anchorNumber;
+#if !UNITY_EDITOR
                     // This is where I need to change _anchorKeyToFind to a list and cycle through all rowKeys (of interest. Statically set for now) and add them to _anchorKeyToFindList
                     // For now it will ignore user's actual input
-                    _anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(_anchorNumberToFind.Value);
-                    #endif
+                    _anchorNumberToFind = new List<long?>();
+                    _anchorKeyToFind = new List<String>();
+
+                    // Add rowkeys
+                    _anchorNumberToFind.Add(17); // Add first flag
+                    _anchorNumberToFind.Add(18); // Add second flag
+                    _anchorNumberToFind.Add(19); // Add third flag
+                    for (int i = 0; i < 3; i++)
+                    {
+                        // Add anchor keys
+                        string currentAnchorKey = await anchorExchanger.RetrieveAnchorKey((long)_anchorNumberToFind[i]);
+                        _anchorKeyToFind.Add(currentAnchorKey);
+                    }
+
+                    //_anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(_anchorNumberToFind.Value);
+#endif
                     if (_anchorKeyToFind == null)
                     {
                         feedbackBox.text = "Anchor Number Not Found!";
@@ -532,7 +560,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 // Should change logic to go through all of the _anchorsToFindList, and set 
                 // Remember that _anchorKeyToFind is not the same as rowkey!
-                anchorsToFind.Add(_anchorKeyToFind);
+                for (int i = 0; i < _anchorKeyToFind.Count; i++)
+                    anchorsToFind.Add(_anchorKeyToFind[i]);
             }
             {
                 anchorsExpected = anchorsToFind.Count;
@@ -540,7 +569,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                 SetAnchorIdsToLocate(anchorsToFind);
 
-               
             }
         }
 

@@ -28,30 +28,14 @@ public class ListOps : MonoBehaviour
 
         // THIS WILL FAIL IF the first one isn't found!!!
 
-        // Comment this out when using on real device.
-        /*********************************************************************/
-        // Initialize flags
-        int i = 0;
-        GameObject currentFlag = GameObject.Find("flagAndPoleNbr" + i);
-        if (currentFlag == null)
-            Debug.Log("current is null!! unable to find future game objects or add them to list");
-        else
-            Debug.Log("current flag is" + currentFlag.name);
-        while (currentFlag != null)
-        {
-            Debug.Log("adding" + currentFlag.name);
-            addFlag(currentFlag);
-            i++;
-            currentFlag = GameObject.Find("flagAndPoleNbr" + i);
-        }
-        /**********************************************************************/
+
     }
     public void addFlag(GameObject newFlag)
     {
         if (newFlag != null)
         {
             flags.Add(newFlag);
-            Debug.Log("added" + newFlag.name + ". Size is now" + flags.Count);
+            Debug.Log("********************************************added at location: " + newFlag.transform.position + ". Size is now" + flags.Count);
 
         }
     }

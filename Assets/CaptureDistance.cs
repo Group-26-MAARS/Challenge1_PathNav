@@ -8,15 +8,35 @@ using moveTo = MoveTo;
 public class CaptureDistance : MonoBehaviour
 {
     bool initialGoalIsSet;
+    int nbrTimes = 100;
     // Start is called before the first frame update
     void Start()
     {
-        // Comment this out when using on real device
+        // Comment this out when using on real device.
+        /*********************************************************************
+        // Initialize flags
+        int i = 0;
+        GameObject currentFlag = GameObject.Find("flagAndPoleNbr" + i);
+        if (currentFlag == null)
+            Debug.Log("current is null!! unable to find future game objects or add them to list");
+        else
+            Debug.Log("current flag is" + currentFlag.name);
+        while (currentFlag != null)
+        {
+            Debug.Log("adding" + currentFlag.name);
+            GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().addFlag(currentFlag);
+            i++;
+            currentFlag = GameObject.Find("flagAndPoleNbr" + i);
+        }
+        **********************************************************************/
+
         beginNavigation();
     }
 
-    void beginNavigation() // Called either from Start (if just using Unity) or from UI button
+    public void beginNavigation() // Called either from Start (if just using Unity) or from UI button
     {
+        Debug.Log("****************************************BEGINNING NAVIGATION*******************************************");
+
         if (initialGoalIsSet == false)
         {
             if ((GameObject.Find("arrow").GetComponent<moveTo>() == null) || (GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>() == null))
@@ -24,11 +44,15 @@ public class CaptureDistance : MonoBehaviour
                 print("arrow or flag list are null in Capture Distance");
                 return;
             }
+            else if(GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().flags.Count == 0)
+            {
+                print("******************Flag count is zero. Can't start navigation********************");
+                return;
+            }
             else // Otherwise, get first flag from the list and set it as destination
             {
                 GameObject myGameObject = GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().getNext();
                 GameObject.Find("arrow").GetComponent<moveTo>().setGoal(myGameObject.transform, myGameObject.name);
-
             }
         }
     }
@@ -36,10 +60,19 @@ public class CaptureDistance : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (nbrTimes == 200)
+        {
+            Debug.Log("**********************************************Camera Position is" + transform.position);
+            nbrTimes = 0;
+        }
+        else
+            nbrTimes++;
+        //if (navigationStarted == false)
+        //    beginNavigation(); // Attempt to start navigation if it hasn't started.
 
         if (MoveTo.goal) // Current goal from MoveTo
         {
-            float dist = Vector3.Distance(MoveTo.goal.transform.position, transform.position);
+            float dist = Vector3.Distance(MoveTo.goal.transform.position, Camera.main.transform.position);
             //print("Distance to goal: " + dist);
 
             if (dist < 1.5) // Made it to current goal. Update Goal
