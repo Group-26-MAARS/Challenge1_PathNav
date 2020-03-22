@@ -61,7 +61,12 @@ public class MoveTo : MonoBehaviour
                                 Debug.Log("usersGameObj is null");
                             else
                             {
-                                Transform myRealPosition = Camera.main.transform;
+                                Transform myRealPosition;
+#if !UNITY_EDITOR
+                                myRealPosition = Camera.main.transform;
+#elif UNITY_EDITOR
+                                myRealPosition = mainCamera.transform;
+#endif
                                 agent.transform.position = myRealPosition.position;
                                 Debug.Log("new position" + myRealPosition.position);
                                 agent.destination = goal.position;
@@ -82,7 +87,14 @@ public class MoveTo : MonoBehaviour
                     Debug.Log("usersGameObj is null");
                 else
                 {
-                    Transform myRealPosition = Camera.main.transform;
+                    Transform myRealPosition;
+#if !UNITY_EDITOR
+
+                    myRealPosition = Camera.main.transform;
+#elif UNITY_EDITOR
+                    myRealPosition = mainCamera.transform;
+#endif
+
                     agent.transform.position = myRealPosition.position;
                 //    Debug.Log("new position" + myRealPosition.position);
                 }

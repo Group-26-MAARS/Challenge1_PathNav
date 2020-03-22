@@ -12,8 +12,7 @@ public class CaptureDistance : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // Comment this out when using on real device.
-        /*********************************************************************
+#if UNITY_EDITOR
         // Initialize flags
         int i = 0;
         GameObject currentFlag = GameObject.Find("flagAndPoleNbr" + i);
@@ -28,9 +27,11 @@ public class CaptureDistance : MonoBehaviour
             i++;
             currentFlag = GameObject.Find("flagAndPoleNbr" + i);
         }
-        **********************************************************************/
 
         beginNavigation();
+#else
+        GameObject.Find("SpatialMapping_VRLab").SetActive(false);
+#endif
     }
 
     public void beginNavigation() // Called either from Start (if just using Unity) or from UI button
@@ -72,7 +73,12 @@ public class CaptureDistance : MonoBehaviour
 
         if (MoveTo.goal) // Current goal from MoveTo
         {
-            float dist = Vector3.Distance(MoveTo.goal.transform.position, Camera.main.transform.position);
+            float dist;
+#if !UNITY_EDITOR
+            dist = Vector3.Distance(MoveTo.goal.transform.position, Camera.main.transform.position);
+#elif UNITY_EDITOR
+            dist = Vector3.Distance(MoveTo.goal.transform.position, transform.position);
+#endif
             //print("Distance to goal: " + dist);
 
             if (dist < 1.5) // Made it to current goal. Update Goal

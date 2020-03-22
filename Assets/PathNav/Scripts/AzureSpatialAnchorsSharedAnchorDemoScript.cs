@@ -135,11 +135,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                     //GameObject.Find("arrow").GetComponent<moveTo>().setGoal(nextObject.transform, nextObject.name);
 
+#if !UNITY_EDITOR
 
-                    // Uncomment out the following when using on real device
-                    //********************************************************************************************
                     //Instead of setting anchor is up as destination, add the game object to the flag list for later use
-                   GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().addFlag(nextObject);
+                    GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().addFlag(nextObject);
                     Debug.Log("********************************************added next Object: " + nextObject.transform.position + ". Main camera's location is " + Camera.main.transform.position + ". other position is " + GameObject.Find("CameraParent").transform.position);
 
                     // Only start navigation if there are destination flags
@@ -149,11 +148,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                         navigationStarted = true;
                     }
 
-                    //********************************************************************************************
-
                     //      AttachTextMesh(nextObject, _anchorNumberToFind);
 
-
+#endif
                     otherSpawnedObjects.Add(nextObject);
 
                     if (anchorsLocated >= anchorsExpected)
