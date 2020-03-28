@@ -8,7 +8,7 @@ using UnityEngine.UI;
 using System.Threading.Tasks;
 
 using moveTo = MoveTo;
-
+using System.Net.Http;
 
 namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
@@ -64,7 +64,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         #if !UNITY_EDITOR
         public AnchorExchanger anchorExchanger = new AnchorExchanger();
         #endif
-
         #region Member Variables
         private AppState _currentAppState = AppState.DemoStepChooseFlow;
         private DemoFlow _currentDemoFlow = DemoFlow.CreateFlow;
@@ -168,6 +167,12 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override void Start()
         {
             base.Start();
+            /*
+            HttpClient c = new HttpClient();
+            Task<string> t = c.GetStringAsync(BaseSharingUrl + "/api/anchors/all");
+            string s = t.Result;
+            Console.WriteLine(s);
+            */
 
             if (!SanityCheckAccessConfiguration())
             {
