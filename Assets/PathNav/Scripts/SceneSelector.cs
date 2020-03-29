@@ -35,11 +35,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         async void Start()
 #pragma warning restore CS1998
         {
+            /*
             if (SelectedSceneNameText == null)
             {
                 Debug.Log("Missing text field");
                 return;
             }
+            */
+    //        Debug.Log("Setting text field to NavigationListAndNavExecution");
+     //       SelectedSceneNameText.text = "NavigationListAndNavExecution";
+            
+
 
 #if !UNITY_EDITOR && (UNITY_WSA || WINDOWS_UWP)
             // Ensure that the device is running a suported build with the spatialperception capability declared.
@@ -138,13 +144,21 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             // increment by 1 less than the list size, and mod.
             SceneIndex = (SceneIndex + SceneBuildIndices.Count - 1) % SceneBuildIndices.Count;
         }
+        public void loadNavigationListAndExecutionScene()
+        {
+            SceneManager.LoadScene("NavigationListAndNavExecution");
+        }
+
 
         public void LaunchSelected()
         {
+
+            /*
             if (SceneIndex >= 0 && SceneIndex < SceneBuildIndices.Count)
             {
                 SceneManager.LoadScene(SceneBuildIndices[SceneIndex]);
             }
+            */
         }
     }
 }
