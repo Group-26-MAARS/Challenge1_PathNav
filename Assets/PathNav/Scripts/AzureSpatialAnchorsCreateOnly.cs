@@ -81,7 +81,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         #region Unity Inspector Variables
         [SerializeField]
-        [Tooltip("The base URL for the example sharing service.")]
+        [Tooltip("The base URL for the sharing service.")]
         private string baseSharingUrl = "https://sharingservice20200308094713.azurewebsites.net";
         #endregion // Unity Inspector Variables
 
