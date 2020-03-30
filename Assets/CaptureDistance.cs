@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 using moveTo = MoveTo;
 
@@ -93,6 +95,7 @@ public class CaptureDistance : MonoBehaviour
                     // Remove Arrow
                     Destroy(GameObject.Find("arrow"));
                     print("All goals have been reached in Path Navigation!");
+                    SceneManager.LoadScene("Challenge1MainMenu");
 
                     // This is when next phase of Challenge 1 needs to be called
                 }
