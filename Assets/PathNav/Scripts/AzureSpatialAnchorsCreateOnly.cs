@@ -259,7 +259,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             if (canEnableBeginNavButton == false) // if Search button has been NOT been clicked
             {
                 InitializeLocateFlowDemo();
-                feedbackBox = GameObject.Find("CreateFlowText").transform.GetComponent<UnityEngine.UI.Text>();
+                //feedbackBox = GameObject.Find("CreateFlowText").transform.GetComponent<UnityEngine.UI.Text>();
 
                 canEnableBeginNavButton = true;
                 GameObject searchOrBeginNavButton = GameObject.Find("Run");
@@ -407,8 +407,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             localAnchorIds.Add(currentCloudAnchor.Identifier);
 
 #if !UNITY_EDITOR
-            //anchorName = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier, anchorName, currentCloudAnchor.Expiration.ToString()));
-            anchorName = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier, anchorName, ""));
+            anchorName = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier, anchorName, currentCloudAnchor.Expiration.ToString()));
+            //anchorName = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier, anchorName, ""));
 #endif
 
             Pose anchorPose = Pose.identity;
