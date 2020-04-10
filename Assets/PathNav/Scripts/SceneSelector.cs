@@ -35,6 +35,22 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         async void Start()
 #pragma warning restore CS1998
         {
+            GameObject createFlowBtn = GameObject.Find("CreateFlowButton");
+            createFlowBtn.transform.localScale = new Vector3(0, 0, 0);
+
+            GameObject anchorNbrBox = GameObject.Find("AnchorNumberBox");
+            anchorNbrBox.transform.localScale = new Vector3(0, 0, 0);
+
+            GameObject mainMenuText = GameObject.Find("CreateAnchorMenuText");
+            mainMenuText.transform.localScale = new Vector3(0, 0, 0);
+
+            GameObject exitBtn = GameObject.Find("ExitBtn");
+            exitBtn.transform.localScale = new Vector3(0, 0, 0);
+
+            GameObject submitAnchorNameBtn = GameObject.Find("SubmitAnchorNameBtn");
+            submitAnchorNameBtn.transform.localScale = new Vector3(0, 0, 0);
+
+            //createAnchorUI.GetComponent<MeshRenderer>().enabled = false;
             /*
             if (SelectedSceneNameText == null)
             {
@@ -42,9 +58,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 return;
             }
             */
-    //        Debug.Log("Setting text field to NavigationListAndNavExecution");
-     //       SelectedSceneNameText.text = "NavigationListAndNavExecution";
-            
+            //        Debug.Log("Setting text field to NavigationListAndNavExecution");
+            //       SelectedSceneNameText.text = "NavigationListAndNavExecution";
+
 
 
 #if !UNITY_EDITOR && (UNITY_WSA || WINDOWS_UWP)

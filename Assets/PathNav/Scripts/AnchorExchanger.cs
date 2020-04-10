@@ -49,17 +49,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }, TaskCreationOptions.LongRunning);
         }
 
-        public async Task<string> RetrieveAnchorKey(long anchorNumber)
+        public async Task<string> RetrieveAnchorKey(string anchorName)
         {
             try
             {
                 HttpClient client = new HttpClient();
-                return await client.GetStringAsync(baseAddress + "/" + anchorNumber.ToString());
+                string retStr = await client.GetStringAsync(baseAddress + "/" + anchorName);
+                return retStr.ToString().Split(':')[1];
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
-                Debug.LogError($"Failed to retrieve anchor key for anchor number: {anchorNumber}.");
+                Debug.LogError($"Failed to retrieve anchor key for anchor number: {anchorName}.");
                 return null;
             }
         }
@@ -79,20 +80,23 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
         }
 
-        internal async Task<long> StoreAnchorKey(string anchorKey)
+        internal async Task<string> StoreAnchorKey(string anchorName, string anchorKey, string expiration)
         {
             if (string.IsNullOrWhiteSpace(anchorKey))
             {
-                return -1;
+                return "";
             }
 
             try
             {
                 HttpClient client = new HttpClient();
-                var response = await client.PostAsync(baseAddress, new StringContent(anchorKey));
+
+                var response = await client.PostAsync(baseAddress, new StringContent(anchorName + ":" + anchorKey + "::" + expiration + ":"));
                 if (response.IsSuccessStatusCode)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
+                    return responseBody;
+                    /*
                     long ret;
                     if (long.TryParse(responseBody, out ret))
                     {
@@ -103,6 +107,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     {
                         Debug.LogError($"Failed to store the anchor key. Failed to parse the response body to a long: {responseBody}.");
                     }
+                    */
                 }
                 else
                 {
@@ -110,13 +115,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
 
                 Debug.LogError($"Failed to store the anchor key: {anchorKey}.");
-                return -1;
+                return "";
             }
             catch (Exception ex)
             {
                 Debug.LogException(ex);
                 Debug.LogError($"Failed to store the anchor key: {anchorKey}.");
-                return -1;
+                return "";
             }
         }
 #endif

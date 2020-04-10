@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Microsoft.Azure.SpatialAnchors.Unity.Examples;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,6 +12,7 @@ public class CaptureDistance : MonoBehaviour
 {
     bool initialGoalIsSet;
     int nbrTimes = 100;
+    int anchorsReceived = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -55,6 +57,7 @@ public class CaptureDistance : MonoBehaviour
             else // Otherwise, get first flag from the list and set it as destination
             {
                 GameObject myGameObject = GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().getNext();
+                anchorsReceived++;
                 GameObject.Find("arrow").GetComponent<moveTo>().setGoal(myGameObject.transform, myGameObject.name);
             }
         }
@@ -70,8 +73,6 @@ public class CaptureDistance : MonoBehaviour
         }
         else
             nbrTimes++;
-        //if (navigationStarted == false)
-        //    beginNavigation(); // Attempt to start navigation if it hasn't started.
 
         if (MoveTo.goal) // Current goal from MoveTo
         {
@@ -88,14 +89,21 @@ public class CaptureDistance : MonoBehaviour
                 //GameObject.Find("arrow").GetComponent<moveTo>().setGoal(ListOps.getNext().transform);
                 GameObject updatedGoal = GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().getNext();
                 if (updatedGoal != null)
+                {
                     GameObject.Find("arrow").GetComponent<moveTo>().setGoal(updatedGoal.transform, updatedGoal.name);
+                    anchorsReceived++;
+                }
                 else
                 {
-                    GameObject.Find("arrow").GetComponent<moveTo>().setGoal(null, "");
-                    // Remove Arrow
-                    Destroy(GameObject.Find("arrow"));
-                    print("All goals have been reached in Path Navigation!");
-                    SceneManager.LoadScene("Challenge1MainMenu");
+                    // First check if all destinations have been reached
+                    if (anchorsReceived == GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchorsCreateOnly>().getNbrDestAnchors())
+                    {
+                        GameObject.Find("arrow").GetComponent<moveTo>().setGoal(null, "");
+                        // Remove Arrow
+                        Destroy(GameObject.Find("arrow"));
+                        print("All goals have been reached in Path Navigation!");
+                        SceneManager.LoadScene("Challenge1MainMenu");
+                    }
 
                     // This is when next phase of Challenge 1 needs to be called
                 }

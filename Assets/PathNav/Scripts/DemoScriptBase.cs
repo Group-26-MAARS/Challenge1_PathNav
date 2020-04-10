@@ -74,7 +74,20 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Start()
         {
-            feedbackBox = XRUXPicker.Instance.GetFeedbackText();
+            //feedbackBox = XRUXPicker.Instance.GetFeedbackText();
+            //feedbackBox = GameObject.Find("CreateAnchorMenuText").transform.GetComponent<UnityEngine.UI.Text>();
+            // Create a temporary reference to the current scene.
+            Scene currentScene = SceneManager.GetActiveScene();
+
+            // Retrieve the name of this scene.
+            string sceneName = currentScene.name;
+
+            if (sceneName.Equals("NavigationListAndNavExecution"))
+                feedbackBox = GameObject.Find("CreateFlowText").transform.GetComponent<UnityEngine.UI.Text>();
+            else if(sceneName.Equals("Challenge1MainMenu"))
+                feedbackBox = GameObject.Find("CreateAnchorMenuText").transform.GetComponent<UnityEngine.UI.Text>();
+
+
             if (feedbackBox == null)
             {
                 Debug.Log($"{nameof(feedbackBox)} not found in scene by XRUXPicker.");
