@@ -82,7 +82,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             // Retrieve the name of this scene.
             string sceneName = currentScene.name;
 
-            if (sceneName.Equals("NavigationListAndNavExecution"))
+            if ((sceneName.Equals("NavigationListAndNavExecution")) || (sceneName.Equals("CombinedExperience")))
                 feedbackBox = GameObject.Find("CreateFlowText").transform.GetComponent<UnityEngine.UI.Text>();
             else if(sceneName.Equals("Challenge1MainMenu"))
                 feedbackBox = GameObject.Find("CreateAnchorMenuText").transform.GetComponent<UnityEngine.UI.Text>();

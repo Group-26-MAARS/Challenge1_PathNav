@@ -61,9 +61,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             { AppState.DemoStepComplete,new DemoStepParams() { StepMessage = "Next: Restart demo", StepColor = Color.clear }}
         };
 
-        #if !UNITY_EDITOR
-            public AnchorExchanger anchorExchanger = new AnchorExchanger();
-        #endif
+#if !UNITY_EDITOR
+            public AnchorExchanger_CombinedExperience anchorExchanger = new AnchorExchanger_CombinedExperience();
+#endif
         #region Member Variables
         private AppState _currentAppState = AppState.DemoStepChooseFlow;
         private DemoFlow _currentDemoFlow = DemoFlow.CreateFlow;

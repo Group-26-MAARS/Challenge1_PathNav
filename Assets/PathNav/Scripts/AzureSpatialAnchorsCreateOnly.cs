@@ -33,7 +33,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             DemoStepStopSessionForQuery,
             DemoStepComplete,
         }
-        int nbrOfDestinationAnchors = 2;
+        string anchorNameForCreation;
 
         internal enum DemoFlow
         {
@@ -45,7 +45,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             { AppState.DemoStepChooseFlow,new DemoStepParams() { StepMessage = "Next: Choose your Demo Flow", StepColor = Color.clear }},
             { AppState.DemoStepInputAnchorNumber,new DemoStepParams() { StepMessage = "Next: Input anchor number", StepColor = Color.clear }},
-            { AppState.DemoStepCreateSession,new DemoStepParams() { StepMessage = "Next: Create CloudSpatialAnchorSession", StepColor = Color.clear }},
+            { AppState.DemoStepCreateSession,new DemoStepParams() { StepMessage = "Enter Anchor Name", StepColor = Color.clear }},
             { AppState.DemoStepConfigSession,new DemoStepParams() { StepMessage = "Next: Configure CloudSpatialAnchorSession", StepColor = Color.clear }},
             { AppState.DemoStepStartSession,new DemoStepParams() { StepMessage = "Next: Start CloudSpatialAnchorSession", StepColor = Color.clear }},
             { AppState.DemoStepCreateLocalAnchor,new DemoStepParams() { StepMessage = "Tap a surface to add the local anchor.", StepColor = Color.blue }},
@@ -58,13 +58,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             { AppState.DemoStepLookForAnchor,new DemoStepParams() { StepMessage = "Next: Look for anchor", StepColor = Color.clear }},
             { AppState.DemoStepLookingForAnchor,new DemoStepParams() { StepMessage = "Looking for anchor...", StepColor = Color.clear }},
             { AppState.DemoStepStopSessionForQuery,new DemoStepParams() { StepMessage = "Next: Stop CloudSpatialAnchorSession for query", StepColor = Color.yellow }},
-            //{ AppState.DemoStepStopSessionForQuery,new DemoStepParams() { StepMessage = "Anchor has been added to List for navigation. Count is now " + GameObject.Find("listOfFlagsGameObj_CombinedExperience").GetComponent<ListOps>().flags.Count, StepColor = Color.yellow }},
+            //{ AppState.DemoStepStopSessionForQuery,new DemoStepParams() { StepMessage = "Anchor has been added to List for navigation. Count is now " + GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().flags.Count, StepColor = Color.yellow }},
             { AppState.DemoStepComplete,new DemoStepParams() { StepMessage = "Next: Restart demo", StepColor = Color.clear }}
         };
 
-        #if !UNITY_EDITOR
-            public AnchorExchanger anchorExchanger = new AnchorExchanger();
-        #endif
+#if !UNITY_EDITOR
+            public AnchorExchanger_CombinedExperience anchorExchanger = new AnchorExchanger_CombinedExperience();
+#endif
         #region Member Variables
         private AppState _currentAppState = AppState.DemoStepChooseFlow;
         private DemoFlow _currentDemoFlow = DemoFlow.CreateFlow;
@@ -75,9 +75,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         //private string _anchorKeyToFind = null;
         private List<string> _anchorKeyToFind = null;
         //private long? _anchorNumberToFind;
-        private List<long?> _anchorNumberToFind = null;
+        private List<string> _anchorNameToFind = null;
         bool navigationStarted = false;
         bool canEnableBeginNavButton = false;
+        int nbrOfDestinationAnchors;
 
         #endregion // Member Variables
 
@@ -106,10 +107,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     if (feedbackBox == null)
                         Debug.LogFormat("feedbackbox is null******");
                     else
-                    feedbackBox.text = stateParams[_currentAppState].StepMessage;
-                        EnableCorrectUIControls();
+                        feedbackBox.text = stateParams[_currentAppState].StepMessage;
+                    EnableCorrectUIControls();
                 }
             }
+        }
+        public int getNbrDestAnchors()
+        {
+            return nbrOfDestinationAnchors;
         }
 
         protected override void OnCloudAnchorLocated(AnchorLocatedEventArgs args)
@@ -117,7 +122,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             base.OnCloudAnchorLocated(args);
 
             Debug.Log("about to check expiration");
-           // if ((args != null) && (args.Anchor != null))
+            // if ((args != null) && (args.Anchor != null))
             //    Debug.Log("Expiration Date for this anchor is " + args.Anchor.Expiration);
 
 
@@ -125,7 +130,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 CloudSpatialAnchor nextCsa = args.Anchor;
                 currentCloudAnchor = args.Anchor;
-       //         Debug.Log("Expiration Date for this anchor is " + nextCsa.Expiration);
+                //         Debug.Log("Expiration Date for this anchor is " + nextCsa.Expiration);
 
 
                 UnityDispatcher.InvokeOnAppThread(() =>
@@ -134,9 +139,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentCloudAnchor = nextCsa;
                     Pose anchorPose = Pose.identity;
 
-                    #if UNITY_ANDROID || UNITY_IOS
+#if UNITY_ANDROID || UNITY_IOS
                     anchorPose = currentCloudAnchor.GetPose();
-                    #endif
+#endif
                     // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
                     GameObject nextObject = SpawnNewAnchoredObject(anchorPose.position, anchorPose.rotation, currentCloudAnchor);
@@ -188,6 +193,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public override void Start()
         {
             base.Start();
+
             /*
             HttpClient c = new HttpClient();
             Task<string> t = c.GetStringAsync(BaseSharingUrl + "/api/anchors/all");
@@ -233,9 +239,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             Debug.LogError("Clicked button. made it to 215");
 
-            #if !UNITY_EDITOR
+#if !UNITY_EDITOR
             anchorExchanger.WatchKeys(BaseSharingUrl);
-            #endif
+#endif
 
             feedbackBox.text = stateParams[currentAppState].StepMessage;
 
@@ -244,15 +250,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             Debug.LogError("Clicked button. made it to 225");
 
             // Jump right into locating anchors.
-        //    InitializeLocateFlowDemo();
+            //    InitializeLocateFlowDemo();
 
         }
         public void searchOrBeginNav()
         {
-            // Get status of Button Text, if it is "Search", run search. Otherwise, begin nav
+            // Get status of Button Text, if it is "Search", run search. Otherwise, v
             if (canEnableBeginNavButton == false) // if Search button has been NOT been clicked
             {
                 InitializeLocateFlowDemo();
+                //feedbackBox = GameObject.Find("CreateFlowText").transform.GetComponent<UnityEngine.UI.Text>();
+
                 canEnableBeginNavButton = true;
                 GameObject searchOrBeginNavButton = GameObject.Find("Run");
                 searchOrBeginNavButton.transform.Find("RunText").GetComponent<UnityEngine.UI.Text>().text = "Begin Nav";
@@ -261,9 +269,67 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 beginNav();
         }
 
+        public void submitAnchorName()
+        {
+            anchorNameForCreation = GameObject.Find("AnchorNumberBox").transform.GetChild(1).transform.GetComponent<UnityEngine.UI.Text>().text;
+
+            if (!anchorNameForCreation.Equals(""))
+            {
+                // Disable the text field
+                GameObject anchorNbrBox = GameObject.Find("AnchorNumberBox");
+                anchorNbrBox.transform.localScale = new Vector3(0, 0, 0);
+                // Disable the submit button
+                GameObject submitAnchorNameBtn = GameObject.Find("SubmitAnchorNameBtn");
+                submitAnchorNameBtn.transform.localScale = new Vector3(0, 0, 0);
+                // Change the Text to the field to new name
+                //GameObject.Find("CreateAnchorMenuText").transform.GetComponent<UnityEngine.UI.Text>().text = "New Anchor Name: " + anchorNameForCreation;
+                feedbackBox.text = "New Anchor Name: " + anchorNameForCreation;
+            }
+        }
+
         public async void createAnchorButtonClicked()
         {
+            // Disable the Regular UI
+            GameObject mainUI = GameObject.Find("MainMenuPanel_Navigation");
+            //mainUI.GetComponent<MeshRenderer>().enabled = false;
+            mainUI.transform.localScale = new Vector3(0, 0, 0);
+
+
+            _currentDemoFlow = DemoFlow.CreateFlow;
             currentAppState = AppState.DemoStepCreateSession;
+
+            // Enable the Create Anchor UI
+            GameObject createFlowBtn = GameObject.Find("CreateFlowButton");
+            createFlowBtn.transform.localScale = new Vector3(1, 1, 1);
+
+            GameObject anchorNbrBox = GameObject.Find("AnchorNumberBox");
+            anchorNbrBox.transform.localScale = new Vector3(1, 1, 1);
+
+            GameObject mainMenuText = GameObject.Find("CreateAnchorMenuText");
+            mainMenuText.transform.localScale = new Vector3(1, 1, 1);
+
+            GameObject exitBtn = GameObject.Find("ExitBtn");
+            exitBtn.transform.localScale = new Vector3(1, 1, 1);
+
+            GameObject submitAnchorNameBtn = GameObject.Find("SubmitAnchorNameBtn");
+            submitAnchorNameBtn.transform.localScale = new Vector3(1, 1, 1);
+
+
+            // Verify input from user
+            //    anchorNameForCreation = GameObject.Find("AnchorNumberBox").transform.GetChild(0).transform.GetComponent<UnityEngine.UI.Text>().text;
+            /*
+                while (anchorNameForCreation.Equals(""))
+                {
+                    feedbackBox.text = "Provide Name for Spatial Anchor";
+                }
+                */
+            //   ConfigureSession();
+            //   currentAppState = AppState.DemoStepStartSession;
+
+            /*
+            await CloudManager.StartSessionAsync();
+            currentAppState = AppState.DemoStepCreateLocalAnchor;
+            */
             await AdvanceCreateFlowDemoAsync();
         }
 
@@ -302,18 +368,18 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             return Color.magenta;
         }
 
-        private void AttachTextMesh(GameObject parentObject, long? dataToAttach)
+        private void AttachTextMesh(GameObject parentObject, string anchorName)
         {
             GameObject go = new GameObject();
 
             TextMesh tm = go.AddComponent<TextMesh>();
-            if (!dataToAttach.HasValue)
+            if (anchorName.Equals(""))
             {
                 tm.text = string.Format("{0}:{1}", localAnchorIds.Contains(currentCloudAnchor.Identifier) ? "L" : "R", currentCloudAnchor.Identifier);
             }
-            else if (dataToAttach != -1)
+            else if (!anchorName.Equals(""))
             {
-                tm.text = $"Anchor Number:{dataToAttach}";
+                tm.text = $"Anchor Number:{anchorName}";
             }
             else
             {
@@ -335,28 +401,30 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             await base.OnSaveCloudAnchorSuccessfulAsync();
 
-            long anchorNumber = -1;
+            string anchorName = anchorNameForCreation
+                ;
 
             localAnchorIds.Add(currentCloudAnchor.Identifier);
 
-            #if !UNITY_EDITOR
-            anchorNumber = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier));
-            #endif
+#if !UNITY_EDITOR
+            anchorName = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier, anchorName, currentCloudAnchor.Expiration.ToString()));
+            //anchorName = (await anchorExchanger.StoreAnchorKey(currentCloudAnchor.Identifier, anchorName, ""));
+#endif
 
             Pose anchorPose = Pose.identity;
 
-            #if UNITY_ANDROID || UNITY_IOS
+#if UNITY_ANDROID || UNITY_IOS
             anchorPose = currentCloudAnchor.GetPose();
-            #endif
+#endif
             // HoloLens: The position will be set based on the unityARUserAnchor that was located.
 
             SpawnOrMoveCurrentAnchoredObject(anchorPose.position, anchorPose.rotation);
 
-            AttachTextMesh(spawnedObject, anchorNumber);
+            AttachTextMesh(spawnedObject, anchorName);
 
             currentAppState = AppState.DemoStepStopSession;
 
-            feedbackBox.text = $"Created anchor {anchorNumber}. Next: Stop cloud anchor session";
+            feedbackBox.text = $"Created anchor {anchorName}. Next: Stop cloud anchor session";
         }
 
         protected override void OnSaveCloudAnchorFailed(Exception exception)
@@ -424,67 +492,72 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             else if (currentAppState == AppState.DemoStepInputAnchorNumber)
             {
-                long anchorNumber;
-               // string inputText = XRUXPickerForMainMenu.Instance.GetDemoInputField().text;
+                string anchorName;
+                // string inputText = XRUXPickerForMainMenu.Instance.GetDemoInputField().text;
 
-                // _anchorNumberToFind = anchorNumber;
+                // _anchorNumberToFind = anchorName;
                 // This is where I need to change _anchorKeyToFind to a list and cycle through all rowKeys (of interest. Statically set for now) and add them to _anchorKeyToFindList
                 // For now it will ignore user's actual input
-                _anchorNumberToFind = new List<long?>();
+                _anchorNameToFind = new List<string>();
                 _anchorKeyToFind = new List<String>();
 
                 // Add rowkeys
                 // Get list of Anchors to add from the Anchor List UI
+                if ((GameObject.Find("Content") == null) || (GameObject.Find("Content").transform == null))
+                    Debug.Log("Null in initlocateflowasync at (0)");
                 Transform anchorListTransform = GameObject.Find("Content").transform;
 
-                int i = 0;
+                nbrOfDestinationAnchors = 0;
                 // Now adding directly to the list containing the anchor keys, not the rows. 
                 //_anchorNumberToFind.Add(24); // Add first flag
                 //_anchorNumberToFind.Add(25); // Add second flag
 
                 Debug.LogError("added anchors to the list that need to be searched");
 
-                for (i = 0; i < nbrOfDestinationAnchors; i++)
-                    {
-                    // Add anchor keys
+                // Add anchor keys
 #if !UNITY_EDITOR
                     Debug.Log("ONLY ADDING 2 ANCHORS TO SEARCH FOR !!***********************************************************************************!!");
 
                     // Now adding directly to the list containing the anchor keys, not the rows. 
-                    //string currentAnchorKey = await anchorExchanger.RetrieveAnchorKey((long)_anchorNumberToFind[i]);
-
+                    //string currentAnchorKey = await anchorExchanger.RetrieveAnchorKey(_anchorNameToFind[i]);
+                    
+                int i = 0;
                     foreach (Transform child in anchorListTransform)
                     {
                         if (((child.Find("Toggle" + i).GetComponent<Toggle>().isOn == true) && child.Find("Toggle" + i)) && (child.Find("Toggle" + i).Find("AnchorContainer").gameObject.transform.childCount > 0))
                         {
+                                    Debug.Log("In initlocateflowasync, made it to (1)");
+
                             // First need to check if actually selected (above)
                             try
                             {
 
                                 _anchorKeyToFind.Add(child.Find("Toggle" + i).Find("AnchorContainer").gameObject.transform.GetChild(0).name);
+                                                    Debug.Log("In initlocateflowasync, made it to (2)");
+
                             }
                             catch(Exception)
                             {
                                 Debug.Log("bad value was attempted to be added to _anchorKeyToFind. value was " + (currentAnchorKey != "" ? currentAnchorKey : ""));
                             }
+                            nbrOfDestinationAnchors++;
                         }
-
                         i++;
                     }
 #endif
 
+                //_anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(_anchorNameToFind.Value);
+                if (_anchorKeyToFind == null)
+                {
+                    if (feedbackBox == null)
+                        Debug.Log("FEEDBACK TEXT IS NULL!! (4)");
+                    feedbackBox.text = "Anchor Number Not Found!";
                 }
-
-                    //_anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(_anchorNumberToFind.Value);
-                    if (_anchorKeyToFind == null)
-                    {
-                        feedbackBox.text = "Anchor Number Not Found!";
-                    }
-                    else
-                    {
-                        _currentDemoFlow = DemoFlow.LocateFlow;
-                        //currentAppState = AppState.DemoStepCreateSession;
-                        currentAppState = AppState.DemoStepCreateSessionForQuery;
+                else
+                {
+                    _currentDemoFlow = DemoFlow.LocateFlow;
+                    //currentAppState = AppState.DemoStepCreateSession;
+                    currentAppState = AppState.DemoStepCreateSessionForQuery;
                     //   XRUXPickerForMainMenu.Instance.GetDemoInputField().text = "";
 
 
@@ -519,7 +592,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 Debug.LogError($"{nameof(AzureSpatialAnchorsCreateOnly)} - Error in {nameof(InitializeLocateFlowDemo)}: {ex.Message}");
             }
         }
-        
+
 
         private async Task AdvanceCreateFlowDemoAsync()
         {
@@ -537,14 +610,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 case AppState.DemoStepConfigSession:
                     Debug.LogError("about to configure session");
 
-                    ConfigureSession();
+                    ConfigureSession(); // Jumping to here.
                     currentAppState = AppState.DemoStepStartSession;
                     break;
-                case AppState.DemoStepStartSession:
+                case AppState.DemoStepStartSession: // Jumping to here.
                     await CloudManager.StartSessionAsync();
                     currentAppState = AppState.DemoStepCreateLocalAnchor;
                     break;
-                case AppState.DemoStepCreateLocalAnchor:
+                case AppState.DemoStepCreateLocalAnchor: // This is set by "IsPlacingObject()"
                     if (spawnedObject != null)
                     {
                         currentAppState = AppState.DemoStepSaveCloudAnchor;
@@ -607,34 +680,34 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
                     break;
 
-    /*
-                case AppState.DemoStepStartSessionForQuery:
-                    await CloudManager.StartSessionAsync();
-                    currentAppState = AppState.DemoStepLookForAnchor;
-                    break;
-                case AppState.DemoStepLookForAnchor:
-                    currentAppState = AppState.DemoStepLookingForAnchor;
-                    currentWatcher = CreateWatcher();
-                    break;
-                case AppState.DemoStepLookingForAnchor:
-                    // Advancement will take place when anchors have all been located.
-                    break;
-    *//*
-                case AppState.DemoStepStopSessionForQuery:
-                    CloudManager.StopSession();
-                    currentAppState = AppState.DemoStepComplete;
-                    break;
-   
-                case AppState.DemoStepComplete:
-                    currentCloudAnchor = null;
-                    currentWatcher = null;
-                    currentAppState = AppState.DemoStepChooseFlow;
-                    CleanupSpawnedObjects();
-                    break;
-                default:
-                    Debug.Log("Shouldn't get here for app state " + currentAppState);
-                    break;
-        */
+                    /*
+                                case AppState.DemoStepStartSessionForQuery:
+                                    await CloudManager.StartSessionAsync();
+                                    currentAppState = AppState.DemoStepLookForAnchor;
+                                    break;
+                                case AppState.DemoStepLookForAnchor:
+                                    currentAppState = AppState.DemoStepLookingForAnchor;
+                                    currentWatcher = CreateWatcher();
+                                    break;
+                                case AppState.DemoStepLookingForAnchor:
+                                    // Advancement will take place when anchors have all been located.
+                                    break;
+                    *//*
+                                case AppState.DemoStepStopSessionForQuery:
+                                    CloudManager.StopSession();
+                                    currentAppState = AppState.DemoStepComplete;
+                                    break;
+
+                                case AppState.DemoStepComplete:
+                                    currentCloudAnchor = null;
+                                    currentWatcher = null;
+                                    currentAppState = AppState.DemoStepChooseFlow;
+                                    CleanupSpawnedObjects();
+                                    break;
+                                default:
+                                    Debug.Log("Shouldn't get here for app state " + currentAppState);
+                                    break;
+                        */
             }
         }
 
@@ -651,8 +724,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             //    Debug.Log("********************************XRUXPickerForMainMenu is null!!****************************");
             if (XRUXPickerForMainMenu.Instance == null)
               Debug.Log("********************************XRUXPickerForMainMenu.Instance is " + XRUXPickerForMainMenu.Instance);
-
-
             if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[0] == null)
             {
                 Debug.Log("********************************first button is null!!****************************");
@@ -661,11 +732,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             {
                 Debug.Log("********************************2nd button is null!!****************************");
             }
-
             switch (currentAppState)
             {
                 case AppState.DemoStepChooseFlow:
-
                     XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject.SetActive(true);
 #if UNITY_WSA
                     XRUXPickerForMainMenu.Instance.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.1f;
@@ -695,7 +764,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(false);
 #else
                     XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(true);
-
                     XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].transform.Find("Text").GetComponent<Text>().text = "Next Step";
                     #endif
                     if ((XRUXPickerForMainMenu.Instance.GetDemoInputField() == null) || (XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject == null))
@@ -705,7 +773,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     break;
             }
             */
-            
+
         }
 
         private void ConfigureSession()
