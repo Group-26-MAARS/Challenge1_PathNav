@@ -165,6 +165,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             SceneManager.LoadScene("NavigationListAndNavExecution");
         }
 
+        public void loadCombinedExperience()
+        {
+            SceneManager.LoadScene("CombinedExperience");
+        }
 
         public void LaunchSelected()
         {
