@@ -1,3 +1,4 @@
+
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 using System;
@@ -74,7 +75,20 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public override void Start()
         {
-            feedbackBox = XRUXPicker.Instance.GetFeedbackText();
+            //feedbackBox = XRUXPicker.Instance.GetFeedbackText();
+            //feedbackBox = GameObject.Find("CreateAnchorMenuText").transform.GetComponent<UnityEngine.UI.Text>();
+            // Create a temporary reference to the current scene.
+            Scene currentScene = SceneManager.GetActiveScene();
+
+            // Retrieve the name of this scene.
+            string sceneName = currentScene.name;
+
+            if ((sceneName.Equals("NavigationListAndNavExecution")) || (sceneName.Equals("CombinedExperience")))
+                feedbackBox = GameObject.Find("CreateFlowText").transform.GetComponent<UnityEngine.UI.Text>();
+            else if (sceneName.Equals("Challenge1MainMenu"))
+                feedbackBox = GameObject.Find("CreateAnchorMenuText").transform.GetComponent<UnityEngine.UI.Text>();
+
+
             if (feedbackBox == null)
             {
                 Debug.Log($"{nameof(feedbackBox)} not found in scene by XRUXPicker.");
@@ -333,13 +347,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         protected override void OnGazeInteraction()
         {
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             // HoloLens gaze interaction
             if (IsPlacingObject())
             {
                 base.OnGazeInteraction();
             }
-            #endif
+#endif
         }
 
         /// <summary>
@@ -351,10 +365,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             base.OnGazeObjectInteraction(hitPoint, hitNormal);
 
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             Quaternion rotation = Quaternion.FromToRotation(Vector3.up, hitNormal);
             SpawnOrMoveCurrentAnchoredObject(hitPoint, rotation);
-            #endif
+#endif
         }
 
         /// <summary>
@@ -386,13 +400,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// <remarks>Currently only called for HoloLens.</remarks>
         protected override void OnSelectInteraction()
         {
-            #if WINDOWS_UWP || UNITY_WSA
+#if WINDOWS_UWP || UNITY_WSA
             if(enableAdvancingOnSelect)
             {
                 // On HoloLens, we just advance the demo.
                 UnityDispatcher.InvokeOnAppThread(() => advanceDemoTask = AdvanceDemoAsync());
             }
-            #endif
+#endif
 
             base.OnSelectInteraction();
         }
