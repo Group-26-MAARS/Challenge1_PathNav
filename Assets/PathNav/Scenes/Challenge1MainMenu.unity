@@ -1821,6 +1821,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 9171740108721542802, guid: 51a84abc247eebb4fa1efc01bdeacf2f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9171740108439478567, guid: 51a84abc247eebb4fa1efc01bdeacf2f,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2021,11 +2026,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 9171740108721542802, guid: 51a84abc247eebb4fa1efc01bdeacf2f,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 9171740107149285020, guid: 51a84abc247eebb4fa1efc01bdeacf2f,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -2215,11 +2215,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1801807061}
+      objectReference: {fileID: 1883503289}
     - target: {fileID: 9171740108721542804, guid: 51a84abc247eebb4fa1efc01bdeacf2f,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: selectProcedure
+      value: loadCombinedExperience
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51a84abc247eebb4fa1efc01bdeacf2f, type: 3}
