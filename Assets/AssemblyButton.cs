@@ -12,8 +12,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.HttpUtility;
-
+using System.Collections.Specialized;
+using System.Web;
 
 public class AssemblyButton : MonoBehaviour
 {
@@ -37,13 +37,13 @@ public class AssemblyButton : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     // @steeve: move this to happen on startup of Unity App
@@ -79,9 +79,8 @@ public class AssemblyButton : MonoBehaviour
                 tempExp.type = "Assembly";
 
                 HttpClient client = new HttpClient();
-
                 string body = $"{tempExp.name}:{JsonConvert.SerializeObject(tempExp)}";
-                NameValueCollection queryString = System.Web.HttpUtility.ParseQueryString(string.Empty);
+                NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
                 queryString.Add("name", tempExp.name);
                 queryString.Add("url", tempExp.url);
 
@@ -97,7 +96,7 @@ public class AssemblyButton : MonoBehaviour
 
             File.WriteAllText(assembliesJsonPath, JsonConvert.SerializeObject(assemblyList));
         }
-    }    
+    }
 
     /// <summary>
     /// Opens up a file browser so user can select the Experience they want
@@ -108,7 +107,6 @@ public class AssemblyButton : MonoBehaviour
         if (GetOS() == "WIN")
         {
             await setupVuforiaStudioLogistics();
-            await setupDataLogistics();
             string username = System.Environment.GetEnvironmentVariable("UserName");
 
             string c1Dir = $"C:\\Users\\{username}\\Documents\\MAARS-C1\\";
@@ -189,18 +187,18 @@ public class AssemblyButton : MonoBehaviour
     public static string GetOS()
     {
         string os = "Unknow";
-        #if UNITY_EDITOR_WIN
-                    os = "WIN";
-        #endif
-        #if UNITY_IOS
+#if UNITY_EDITOR_WIN
+        os = "WIN";
+#endif
+#if UNITY_IOS
                     os = "IPHONE";
-        #endif
-        #if UNITY_ANDROID
-                    os = "ANDROID";
-        #endif
-        #if UNITY_WEBGL
+#endif
+#if UNITY_ANDROID
+        os = "ANDROID";
+#endif
+#if UNITY_WEBGL
                     os = "WEBGL";
-        #endif
+#endif
         return os;
     }
 }
