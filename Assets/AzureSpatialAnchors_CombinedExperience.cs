@@ -255,6 +255,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         }
         public void searchOrBeginNav()
         {
+            
             // Get status of Button Text, if it is "Search", run search. Otherwise, v
             if (canEnableBeginNavButton == false) // if Search button has been NOT been clicked
             {
@@ -267,7 +268,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             else
                 beginNav();
-        }
+            }
 
         public void submitAnchorName()
         {

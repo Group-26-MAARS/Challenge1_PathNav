@@ -21,12 +21,18 @@ public class AssemblyButton : MonoBehaviour
     /// An experience can be of type Assembly or of type Route
     /// A full walkthrough will be a list of Experiences (typically as list of JSON)
     /// </summary>
+    /// 
+    private List<Experience> experienceItems;
+
+
+
     public class Experience
     {
         public string name;
-        public string thingworxServer;
-        public string url;
+        public string thingworxServer; // Will be empty for this experience if type is "Route"
+        public string url; // Will be empty for this experience if type is "Route"
         public string type;
+        public ExperienceRoute route; // Will be null for this experience if type is "Assembly"
 
         override public string ToString()
         {
@@ -34,9 +40,63 @@ public class AssemblyButton : MonoBehaviour
         }
     }
 
+    public class ExperienceAnchor
+    {
+        private string _anchorName;
+        private string _anchorData;
+
+        public string getAnchorName()
+        {
+            return _anchorName;
+        }
+
+        public void setAnchorName(string  anchorName)
+        {
+            _anchorName = anchorName;
+        }
+
+        public string getAnchorData()
+        {
+            return _anchorData;
+        }
+
+        public void setAnchorData(string anchorData)
+        {
+            _anchorData = anchorData;
+        }
+    }
+
+
+    public class ExperienceRoute
+    {
+        private string _routeName;
+        private List<ExperienceAnchor> _anchors;
+
+        public List<ExperienceAnchor> getAnchors()
+        {
+            return _anchors;
+        }
+
+        public void setAnchors(List<ExperienceAnchor> anchors)
+        {
+            _anchors = anchors;
+        }
+
+        public string getRouteName()
+        {
+            return _routeName;
+        }
+
+        public void setRouteName(string routeName)
+        {
+            _routeName = routeName;
+        }
+    }
+
     // Start is called before the first frame update
     void Start()
     {
+        experienceItems = new List<Experience>();
 
     }
 
@@ -127,6 +187,66 @@ public class AssemblyButton : MonoBehaviour
         }
 
     }
+    public void addRouteExperience(Experience currExperience, string currExpStr)
+    {
+        int anchorCount = 0;
+
+        // Parse Route, create Experience Obj
+        ExperienceRoute currRoute = new ExperienceRoute();
+        currRoute.setRouteName(currExpStr.Replace(" ", "").Split('`')[0]);
+        // Get Comma separated list of anchors
+        anchorCount = currExpStr.Replace(" ", "").Split('`')[1].Replace(" ", "").Split(',').Length;
+        List<ExperienceAnchor> tempAnchorList = new List<ExperienceAnchor>();
+
+        for (int j = 0; j < anchorCount; j++)
+        {
+            string currAnchorStr = currExpStr.Split('`')[1].Replace(" ", "").Split(',')[j];
+            ExperienceAnchor anchor = new ExperienceAnchor();
+            anchor.setAnchorName(currAnchorStr.Split(':')[0]);
+            anchor.setAnchorData(currAnchorStr.Split(':')[1]);
+            tempAnchorList.Add(anchor);
+        }
+        currRoute.setAnchors(tempAnchorList);
+        currExperience.type = "Route";
+        currExperience.route = currRoute;
+        experienceItems.Add(currExperience);
+    }
+
+    public async void runSelectedExperience()
+    {
+        string experienceName = "MyExperienceName"; // Will need to get this from combobox
+        // Get Experience from API
+        HttpClient client = new HttpClient();
+        string  allExperienceText = await client.GetStringAsync("https://sharingservice20200308094713.azurewebsites.net" + "/api/experiences/allassociated/" + experienceName);
+        Console.Write(allExperienceText);
+
+        int nbrExperienceItems = allExperienceText.Split('&').Length;
+        // For Each Experience Item
+        for (int i = 0; i < nbrExperienceItems; i++)
+        {
+            Experience tempExperience = new Experience();
+            // Check if Route or Animation
+            string currExpStr = allExperienceText.Split('&')[i];
+            // If Route
+            if (currExpStr[0] == 'R')
+                addRouteExperience(tempExperience, currExpStr);
+            else if(currExpStr[0] == 'A')
+            {
+
+            }
+            // Add Experience Object to list
+        }
+
+        // For Each Experience, Determine if Route or Animation
+        /*
+        R_ThisRoute ` test0:40kjl3kht: AtUCF: 12 - 20 - 20:this is the first anchor 
+            in the newerer form,myNewAnchor4eight2020: b3c219d0 - de05 - 479d - 88a8 - 
+            087d731c7afe::04 / 15 / 2020 22:03,dylan: 6cdcbc70 - 0286 - 4302 - 887ec3e30ab29d0e:::
+        `A_someAnimationName=>someAnimationSerializedJSON ` R_FinalRoute=>ghg: 2918d 345 - 3ae3 - 
+            407e-beb7 - fefecc354155:::,dylan1: 440b519c - 6aad - 41bc - 96c5 - 2546a7bb9a78::: 
+        */
+    }
+
 
 
     /// <summary>
