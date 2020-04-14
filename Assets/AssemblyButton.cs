@@ -28,15 +28,17 @@ public class AssemblyButton : MonoBehaviour
 
     public class Experience
     {
-        public string name;
-        public string thingworxServer; // Will be empty for this experience if type is "Route"
-        public string url; // Will be empty for this experience if type is "Route"
-        public string type;
+        public string _type;
         public ExperienceRoute route; // Will be null for this experience if type is "Assembly"
-
-        override public string ToString()
+        public ExperienceAnimation animation; // Will be null for this experience if type is "Route"
+        public string getType()
         {
-            return $"name: {this.name}\ntype:{this.type}\nurl:{this.url}";
+            return _type;
+        }
+
+        public void setType(string type)
+        {
+            _type = type;
         }
     }
 
@@ -63,6 +65,47 @@ public class AssemblyButton : MonoBehaviour
         public void setAnchorData(string anchorData)
         {
             _anchorData = anchorData;
+        }
+
+    }
+
+    public class ExperienceAnimation
+    {
+        public string name;
+        public string _thingworxServer; // Will be empty for this experience if type is "Route"
+        public string url; // Will be empty for this experience if type is "Route"
+
+        public string getName()
+        {
+            return name;
+        }
+
+        public void setName(string name)
+        {
+            this.name = name;
+        }
+
+        public string getThingWorxServer()
+        {
+            return _thingworxServer;
+        }
+
+        public void setThingWorxServer(string thingworxServer)
+        {
+            _thingworxServer = thingworxServer;
+        }
+        public string getURL()
+        {
+            return url;
+        }
+
+        public void setURL(string url)
+        {
+            this.url = url;
+        }
+        override public string ToString()
+        {
+            return $"name: {this.name}\ntype:{"Animation"}\nurl:{this.url}";
         }
     }
 
@@ -134,15 +177,16 @@ public class AssemblyButton : MonoBehaviour
             foreach (string sub in subdirs)
             {
                 string json = File.ReadAllText($"{sub}\\appConfig.json");
-                Experience tempExp = JsonUtility.FromJson<Experience>(json);
-                tempExp.url = WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={tempExp.thingworxServer}/ExperienceService/content/projects/{tempExp.name}/index.html");
-                tempExp.type = "Assembly";
+                Experience tmpExperience = new Experience();
+                ExperienceAnimation animationExperience = JsonUtility.FromJson<ExperienceAnimation>(json);
+                animationExperience.setURL(WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={animationExperience.getThingWorxServer()}/ExperienceService/content/projects/{animationExperience.getName()}/index.html"));
+                tmpExperience.setType("Assembly");
 
                 HttpClient client = new HttpClient();
-                string body = $"{tempExp.name}:{JsonConvert.SerializeObject(tempExp)}";
+                string body = $"{animationExperience.getName()}:{JsonConvert.SerializeObject(animationExperience)}";
                 NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
-                queryString.Add("name", tempExp.name);
-                queryString.Add("url", tempExp.url);
+                queryString.Add("name", animationExperience.getName());
+                queryString.Add("url", animationExperience.getURL());
 
                 string url = "https://sharingservice20200308094713.azurewebsites.net/api/animations";
 
@@ -150,8 +194,8 @@ public class AssemblyButton : MonoBehaviour
                 var response = await client.PostAsync(url, new StringContent(queryString.ToString()));
                 //Debug.Log(response.StatusCode);
                 // end POST
-
-                assemblyList.Add(tempExp);
+                tmpExperience.animation = animationExperience;
+                assemblyList.Add(tmpExperience);
             }
 
             File.WriteAllText(assembliesJsonPath, JsonConvert.SerializeObject(assemblyList));
@@ -187,29 +231,38 @@ public class AssemblyButton : MonoBehaviour
         }
 
     }
-    public void addRouteExperience(Experience currExperience, string currExpStr)
+    public void addRouteExperience(Experience currExperience, string currRouteStr)
     {
         int anchorCount = 0;
 
         // Parse Route, create Experience Obj
         ExperienceRoute currRoute = new ExperienceRoute();
-        currRoute.setRouteName(currExpStr.Replace(" ", "").Split('`')[0]);
+        currRoute.setRouteName(currRouteStr.Replace(" ", "").Split('`')[0]);
         // Get Comma separated list of anchors
-        anchorCount = currExpStr.Replace(" ", "").Split('`')[1].Replace(" ", "").Split(',').Length;
+        anchorCount = currRouteStr.Replace(" ", "").Split('`')[1].Replace(" ", "").Split(',').Length;
         List<ExperienceAnchor> tempAnchorList = new List<ExperienceAnchor>();
 
         for (int j = 0; j < anchorCount; j++)
         {
-            string currAnchorStr = currExpStr.Split('`')[1].Replace(" ", "").Split(',')[j];
+            string currAnchorStr = currRouteStr.Split('`')[1].Replace(" ", "").Split(',')[j];
             ExperienceAnchor anchor = new ExperienceAnchor();
             anchor.setAnchorName(currAnchorStr.Split(':')[0]);
             anchor.setAnchorData(currAnchorStr.Split(':')[1]);
             tempAnchorList.Add(anchor);
         }
         currRoute.setAnchors(tempAnchorList);
-        currExperience.type = "Route";
+        currExperience.setType("Route");
         currExperience.route = currRoute;
         experienceItems.Add(currExperience);
+    }
+
+    public async void addAnimationExperience(Experience currExperienceItem, string currAnimationStr)
+    {
+        ExperienceAnimation animationExperience = new ExperienceAnimation();
+        animationExperience = JsonConvert.DeserializeObject<ExperienceAnimation>(currAnimationStr.Split(new char[] {'~'})[1]);
+        currExperienceItem.animation = animationExperience;
+        currExperienceItem.setType("Assembly");
+        experienceItems.Add(currExperienceItem);
     }
 
     public async void runSelectedExperience()
@@ -223,8 +276,9 @@ public class AssemblyButton : MonoBehaviour
         int nbrExperienceItems = allExperienceText.Split('&').Length;
         // For Each Experience Item
         for (int i = 0; i < nbrExperienceItems; i++)
-        {
+        { 
             Experience tempExperience = new Experience();
+            
             // Check if Route or Animation
             string currExpStr = allExperienceText.Split('&')[i];
             // If Route
@@ -232,19 +286,10 @@ public class AssemblyButton : MonoBehaviour
                 addRouteExperience(tempExperience, currExpStr);
             else if(currExpStr[0] == 'A')
             {
-
+                addAnimationExperience(tempExperience, currExpStr);
             }
             // Add Experience Object to list
         }
-
-        // For Each Experience, Determine if Route or Animation
-        /*
-        R_ThisRoute ` test0:40kjl3kht: AtUCF: 12 - 20 - 20:this is the first anchor 
-            in the newerer form,myNewAnchor4eight2020: b3c219d0 - de05 - 479d - 88a8 - 
-            087d731c7afe::04 / 15 / 2020 22:03,dylan: 6cdcbc70 - 0286 - 4302 - 887ec3e30ab29d0e:::
-        `A_someAnimationName=>someAnimationSerializedJSON ` R_FinalRoute=>ghg: 2918d 345 - 3ae3 - 
-            407e-beb7 - fefecc354155:::,dylan1: 440b519c - 6aad - 41bc - 96c5 - 2546a7bb9a78::: 
-        */
     }
 
 
@@ -260,17 +305,17 @@ public class AssemblyButton : MonoBehaviour
 
         foreach (Experience exp in steps)
         {
-            switch (exp.type)
+            switch (exp.getType())
             {
                 case "Assembly":
-                    HandleAssembly(exp);
+                    HandleAssembly(exp.animation);
                     break;
                 case "Route":
-                    HandleRoute(exp);
+                    HandleRoute(exp.route);
                     break;
 
                 default:
-                    HandleRoute(exp);
+                    HandleRoute(exp.route);
                     break;
             }
         }
@@ -282,10 +327,10 @@ public class AssemblyButton : MonoBehaviour
     /// <param name="exp">The Experience representing the Assembly </param>
     /// @steeve: Need to find some way of determing whether user is "done" w/ Assembly
     /// (possibly when the process ends?)
-    public void HandleAssembly(Experience exp)
+    public void HandleAssembly(ExperienceAnimation exp)
     {
         //Debug.Log(exp);
-        Application.OpenURL(exp.url);
+        Application.OpenURL(exp.getURL());
     }
 
     /// <summary>
@@ -294,7 +339,7 @@ public class AssemblyButton : MonoBehaviour
     /// </summary>
     /// <param name="exp"></param>
     /// @steeve: Connect w/ Dylan to see where that functionality is and call into it.
-    public void HandleRoute(Experience exp)
+    public void HandleRoute(ExperienceRoute exp)
     {
         //    Newtonsoft.Json.Linq.JObject parsed = Newtonsoft.Json.Linq.JObject.Parse(json);
 
