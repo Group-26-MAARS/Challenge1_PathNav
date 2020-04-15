@@ -14,6 +14,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
 using System.Web;
+using Microsoft.Azure.SpatialAnchors.Unity.Examples;
+using UnityEngine.SceneManagement;
+
 
 public class AssemblyButton : MonoBehaviour
 {
@@ -21,22 +24,125 @@ public class AssemblyButton : MonoBehaviour
     /// An experience can be of type Assembly or of type Route
     /// A full walkthrough will be a list of Experiences (typically as list of JSON)
     /// </summary>
+    /// 
+    private List<Experience> experienceItems;
+
+
+
     public class Experience
     {
-        public string name;
-        public string thingworxServer;
-        public string url;
-        public string type;
+        public string _type;
+        public ExperienceRoute route; // Will be null for this experience if type is "Assembly"
+        public ExperienceAnimation animation; // Will be null for this experience if type is "Route"
+        public string getType()
+        {
+            return _type;
+        }
 
+        public void setType(string type)
+        {
+            _type = type;
+        }
+    }
+
+    public class ExperienceAnchor
+    {
+        private string _anchorName;
+        private string _anchorData;
+
+        public string getAnchorName()
+        {
+            return _anchorName;
+        }
+
+        public void setAnchorName(string  anchorName)
+        {
+            _anchorName = anchorName;
+        }
+
+        public string getAnchorData()
+        {
+            return _anchorData;
+        }
+
+        public void setAnchorData(string anchorData)
+        {
+            _anchorData = anchorData;
+        }
+
+    }
+
+    public class ExperienceAnimation
+    {
+        public string name;
+        public string _thingworxServer; // Will be empty for this experience if type is "Route"
+        public string url; // Will be empty for this experience if type is "Route"
+
+        public string getName()
+        {
+            return name;
+        }
+
+        public void setName(string name)
+        {
+            this.name = name;
+        }
+
+        public string getThingWorxServer()
+        {
+            return _thingworxServer;
+        }
+
+        public void setThingWorxServer(string thingworxServer)
+        {
+            _thingworxServer = thingworxServer;
+        }
+        public string getURL()
+        {
+            return url;
+        }
+
+        public void setURL(string url)
+        {
+            this.url = url;
+        }
         override public string ToString()
         {
-            return $"name: {this.name}\ntype:{this.type}\nurl:{this.url}";
+            return $"name: {this.name}\ntype:{"Animation"}\nurl:{this.url}";
+        }
+    }
+
+
+    public class ExperienceRoute
+    {
+        private string _routeName;
+        private List<ExperienceAnchor> _anchors;
+
+        public List<ExperienceAnchor> getAnchors()
+        {
+            return _anchors;
+        }
+
+        public void setAnchors(List<ExperienceAnchor> anchors)
+        {
+            _anchors = anchors;
+        }
+
+        public string getRouteName()
+        {
+            return _routeName;
+        }
+
+        public void setRouteName(string routeName)
+        {
+            _routeName = routeName;
         }
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        experienceItems = new List<Experience>();
 
     }
 
@@ -74,15 +180,17 @@ public class AssemblyButton : MonoBehaviour
             foreach (string sub in subdirs)
             {
                 string json = File.ReadAllText($"{sub}\\appConfig.json");
-                Experience tempExp = JsonUtility.FromJson<Experience>(json);
-                tempExp.url = WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={tempExp.thingworxServer}/ExperienceService/content/projects/{tempExp.name}/index.html");
-                tempExp.type = "Assembly";
+                Experience tmpExperience = new Experience();
+                ExperienceAnimation animationExperience = JsonUtility.FromJson<ExperienceAnimation>(json);
+                animationExperience.
+                    setURL(WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={animationExperience.getThingWorxServer()}/ExperienceService/content/projects/{animationExperience.getName()}/index.html"));
+                tmpExperience.setType("Assembly");
 
                 HttpClient client = new HttpClient();
-                string body = $"{tempExp.name}:{JsonConvert.SerializeObject(tempExp)}";
+                string body = $"{animationExperience.getName()}:{JsonConvert.SerializeObject(animationExperience)}";
                 NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
-                queryString.Add("name", tempExp.name);
-                queryString.Add("url", tempExp.url);
+                queryString.Add("name", animationExperience.getName());
+                queryString.Add("url", animationExperience.getURL());
 
                 string url = "https://sharingservice20200308094713.azurewebsites.net/api/animations";
 
@@ -90,8 +198,8 @@ public class AssemblyButton : MonoBehaviour
                 var response = await client.PostAsync(url, new StringContent(queryString.ToString()));
                 //Debug.Log(response.StatusCode);
                 // end POST
-
-                assemblyList.Add(tempExp);
+                tmpExperience.animation = animationExperience;
+                assemblyList.Add(tmpExperience);
             }
 
             File.WriteAllText(assembliesJsonPath, JsonConvert.SerializeObject(assemblyList));
@@ -127,6 +235,127 @@ public class AssemblyButton : MonoBehaviour
         }
 
     }
+    /// <summary>
+    /// Creates object of class ExperienceRoute, populates with data from API and adds it to experienceItems queue
+    /// </summary>
+    /// <param name="currExperience">A pointer the experience item that is added to the list of experiences</param>
+    /// <param name="currRouteStr">The current route string from the API for this route</param>
+    public void addRouteExperience(Experience currExperience, string currRouteStr)
+    {
+        int anchorCount = 0;
+
+        // Parse Route, create Experience Obj
+        ExperienceRoute currRoute = new ExperienceRoute();
+        currRoute.setRouteName(currRouteStr.Replace(" ", "").Split('`')[0]);
+        // Get Comma separated list of anchors
+        anchorCount = currRouteStr.Replace(" ", "").Split('`')[1].Replace(" ", "").Split(',').Length;
+        List<ExperienceAnchor> tempAnchorList = new List<ExperienceAnchor>();
+
+        for (int j = 0; j < anchorCount; j++)
+        {
+            string currAnchorStr = currRouteStr.Split('`')[1].Replace(" ", "").Split(',')[j];
+            ExperienceAnchor anchor = new ExperienceAnchor();
+            anchor.setAnchorName(currAnchorStr.Split(':')[0]);
+            anchor.setAnchorData(currAnchorStr.Split(':')[1]);
+            tempAnchorList.Add(anchor);
+        }
+        currRoute.setAnchors(tempAnchorList);
+        currExperience.setType("Route");
+        currExperience.route = currRoute;
+        experienceItems.Add(currExperience);
+    }
+
+    /// <summary>
+    /// Creates object of class ExperienceAnimation, populates with data from API and adds it to experienceItems queue
+    /// </summary>
+    /// <param name="currExperienceItem">A pointer the experience item that is added to the list of experiences</param>
+    /// <param name="currAnimationStr">The current animation string from the API for this animation</param>
+    public void addAnimationExperience(Experience currExperienceItem, string currAnimationStr)
+    {
+        ExperienceAnimation animationExperience = new ExperienceAnimation();
+        animationExperience = JsonConvert.DeserializeObject<ExperienceAnimation>(currAnimationStr.Split(new char[] {'~'})[1]);
+        currExperienceItem.animation = animationExperience;
+        currExperienceItem.setType("Assembly");
+        experienceItems.Add(currExperienceItem);
+    }
+
+    /// <summary>
+    /// Initializes list of experience items. Each item is an object of class ExperienceAnimation or
+    /// ExperienceRoute.
+    /// </summary>
+    /// <param name="experienceName">The selected experience from the combobox</param>
+
+    public async void initializeExperienceItems(string experienceName)
+    {
+        // Get Experience from API
+        HttpClient client = new HttpClient();
+        string allExperienceText = await client.GetStringAsync("https://sharingservice20200308094713.azurewebsites.net" + 
+            "/api/experiences/allassociated/" + experienceName);
+        Console.Write(allExperienceText);
+
+        int nbrExperienceItems = allExperienceText.Split('&').Length;
+        // For Each Experience Item
+        for (int i = 0; i < nbrExperienceItems; i++)
+        {
+            Experience tempExperience = new Experience();
+
+            // Check if Route or Animation
+            string currExpStr = allExperienceText.Split('&')[i];
+            // If Route
+            if (currExpStr[0] == 'R')
+                addRouteExperience(tempExperience, currExpStr);
+            else if (currExpStr[0] == 'A')
+            {
+                addAnimationExperience(tempExperience, currExpStr);
+            }
+            // Add Experience Object to list
+        }
+    }
+
+    /// <summary>
+    /// Pulls and runs next experience item from experienceItems
+    /// </summary>
+    public void pullAndRunNextExpItem()
+    {
+        Experience currExp = new Experience();
+        currExp = experienceItems[0];
+        if (currExp != null)
+        {
+            experienceItems.RemoveAt(0);
+            if (currExp.getType() == "Route")
+            {
+                HandleRoute(currExp.route);
+            }
+            else if (currExp.getType() == "Assembly")
+            {
+                HandleAssembly(currExp.animation);
+            }
+        }
+
+    }
+
+    /// <summary>
+    /// Initializes Experience list items and creates a queue to pull from then pulls first item
+    /// </summary>
+    /// @dylan: Should show some window indicating to the user that the experience is complete
+    public void runSelectedExperience()
+    {
+        string experienceName = "MyExperienceName"; // Will need to get this from combobox
+        initializeExperienceItems(experienceName);
+
+        // Pull Experience type and run
+        if (experienceItems.Count > 0)
+        {
+            pullAndRunNextExpItem();
+        }
+        else
+        {
+            // Should show some window indicating to the user that the Experience is complete
+            // Launch Main Menu
+            SceneManager.LoadScene("Challenge1MainMenu");
+        }
+    }
+
 
 
     /// <summary>
@@ -140,17 +369,17 @@ public class AssemblyButton : MonoBehaviour
 
         foreach (Experience exp in steps)
         {
-            switch (exp.type)
+            switch (exp.getType())
             {
                 case "Assembly":
-                    HandleAssembly(exp);
+                    HandleAssembly(exp.animation);
                     break;
                 case "Route":
-                    HandleRoute(exp);
+                    HandleRoute(exp.route);
                     break;
 
                 default:
-                    HandleRoute(exp);
+                    HandleRoute(exp.route);
                     break;
             }
         }
@@ -162,10 +391,10 @@ public class AssemblyButton : MonoBehaviour
     /// <param name="exp">The Experience representing the Assembly </param>
     /// @steeve: Need to find some way of determing whether user is "done" w/ Assembly
     /// (possibly when the process ends?)
-    public void HandleAssembly(Experience exp)
+    public void HandleAssembly(ExperienceAnimation exp)
     {
         //Debug.Log(exp);
-        Application.OpenURL(exp.url);
+        Application.OpenURL(exp.getURL());
     }
 
     /// <summary>
@@ -174,7 +403,7 @@ public class AssemblyButton : MonoBehaviour
     /// </summary>
     /// <param name="exp"></param>
     /// @steeve: Connect w/ Dylan to see where that functionality is and call into it.
-    public void HandleRoute(Experience exp)
+    public void HandleRoute(ExperienceRoute exp)
     {
         //    Newtonsoft.Json.Linq.JObject parsed = Newtonsoft.Json.Linq.JObject.Parse(json);
 
@@ -182,6 +411,19 @@ public class AssemblyButton : MonoBehaviour
         //    {
         //        Debug.Log($"{pair.Key}: {pair.Value}");
         //    }
+        // Add Anchors for the route
+        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
+            initializeAnchorKeyList();
+
+        foreach (ExperienceAnchor anchorExp in exp.getAnchors())
+        {
+            GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
+                addAnchorKeyToFind(anchorExp.getAnchorName());
+        }
+
+        // Run 
+        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
+            searchAndBeginNav();
     }
 
     public static string GetOS()
