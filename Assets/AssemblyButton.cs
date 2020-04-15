@@ -382,7 +382,6 @@ public class AssemblyButton : MonoBehaviour
 
         // Run 
         GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().searchAndBeginNav();
-
     }
 
     public static string GetOS()

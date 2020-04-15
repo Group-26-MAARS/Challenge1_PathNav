@@ -102,7 +102,8 @@ public class CaptureDistance : MonoBehaviour
                         // Remove Arrow
                         Destroy(GameObject.Find("arrow"));
                         print("All goals have been reached in Path Navigation!");
-                        SceneManager.LoadScene("Challenge1MainMenu");
+                        GameObject.Find("ExperienceController").GetComponent<AssemblyButton>().pullAndRunNextExpItem();
+
                     }
 
                     // This is when next phase of Challenge 1 needs to be called
