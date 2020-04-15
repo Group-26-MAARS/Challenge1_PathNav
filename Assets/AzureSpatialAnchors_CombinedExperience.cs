@@ -40,6 +40,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             CreateFlow = 0,
             LocateFlow
         }
+        public void addAnchorKeyToFind(string anchorKey)
+        {
+            _anchorKeyToFind.Add(anchorKey);
+        }
 
         private readonly Dictionary<AppState, DemoStepParams> stateParams = new Dictionary<AppState, DemoStepParams>
         {
@@ -252,6 +256,17 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             // Jump right into locating anchors.
             //    InitializeLocateFlowDemo();
 
+        }
+        public void initializeAnchorKeyList()
+        {
+            _anchorKeyToFind = new List<string>();
+
+        }
+        public void searchAndBeginNav()
+        {
+            // Initialize list of anchors to find
+            InitializeLocateFlowDemo();
+            beginNav();
         }
         public void searchOrBeginNav()
         {
@@ -532,9 +547,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                             // First need to check if actually selected (above)
                             try
                             {
-
-                                _anchorKeyToFind.Add(child.Find("Toggle" + i).Find("AnchorContainer").gameObject.transform.GetChild(0).name);
-                                                    Debug.Log("In initlocateflowasync, made it to (2)");
+                // This will not be called in CombinedExperience
+                               // _anchorKeyToFind
+                               // _anchorKeyToFind.Add(child.Find("Toggle" + i).Find("AnchorContainer").gameObject.transform.GetChild(0).name);
+                                //                    Debug.Log("In initlocateflowasync, made it to (2)");
 
                             }
                             catch(Exception)

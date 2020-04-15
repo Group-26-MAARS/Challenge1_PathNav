@@ -14,6 +14,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Collections.Specialized;
 using System.Web;
+using Microsoft.Azure.SpatialAnchors.Unity.Examples;
 
 public class AssemblyButton : MonoBehaviour
 {
@@ -264,31 +265,55 @@ public class AssemblyButton : MonoBehaviour
         currExperienceItem.setType("Assembly");
         experienceItems.Add(currExperienceItem);
     }
-
-    public async void runSelectedExperience()
+    public async void initializeExperienceItems(string experienceName)
     {
-        string experienceName = "MyExperienceName"; // Will need to get this from combobox
         // Get Experience from API
         HttpClient client = new HttpClient();
-        string  allExperienceText = await client.GetStringAsync("https://sharingservice20200308094713.azurewebsites.net" + "/api/experiences/allassociated/" + experienceName);
+        string allExperienceText = await client.GetStringAsync("https://sharingservice20200308094713.azurewebsites.net" + "/api/experiences/allassociated/" + experienceName);
         Console.Write(allExperienceText);
 
         int nbrExperienceItems = allExperienceText.Split('&').Length;
         // For Each Experience Item
         for (int i = 0; i < nbrExperienceItems; i++)
-        { 
+        {
             Experience tempExperience = new Experience();
-            
+
             // Check if Route or Animation
             string currExpStr = allExperienceText.Split('&')[i];
             // If Route
             if (currExpStr[0] == 'R')
                 addRouteExperience(tempExperience, currExpStr);
-            else if(currExpStr[0] == 'A')
+            else if (currExpStr[0] == 'A')
             {
                 addAnimationExperience(tempExperience, currExpStr);
             }
             // Add Experience Object to list
+        }
+    }
+    public void pullAndRunNextExpItem()
+    {
+        Experience currExp = new Experience();
+        currExp = experienceItems[0];
+        experienceItems.RemoveAt(0);
+        if (currExp.getType() == "Route")
+        {
+            HandleRoute(currExp.route);
+        }
+        else if(currExp.getType() == "Assembly")
+        {
+            HandleAssembly(currExp.animation);
+        }
+
+    }
+    public void runSelectedExperience()
+    {
+        string experienceName = "MyExperienceName"; // Will need to get this from combobox
+        initializeExperienceItems(experienceName);
+
+        // Pull Experience type and run
+        if (experienceItems.Count > 0)
+        {
+            pullAndRunNextExpItem();
         }
     }
 
@@ -347,6 +372,17 @@ public class AssemblyButton : MonoBehaviour
         //    {
         //        Debug.Log($"{pair.Key}: {pair.Value}");
         //    }
+        // Add Anchors for the route
+        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().initializeAnchorKeyList();
+
+        foreach (ExperienceAnchor anchorExp in exp.getAnchors())
+        {
+            GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().addAnchorKeyToFind(anchorExp.getAnchorName());
+        }
+
+        // Run 
+        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().searchAndBeginNav();
+
     }
 
     public static string GetOS()
