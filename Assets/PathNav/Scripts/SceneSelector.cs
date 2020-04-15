@@ -7,6 +7,16 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System;
 
+using System.IO;
+using Newtonsoft.Json;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Collections.Specialized;
+using System.Web;
+
+
 namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 {
     public class SceneSelector : MonoBehaviour
@@ -35,6 +45,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         async void Start()
 #pragma warning restore CS1998
         {
+            setupVuforiaStudioLogistics();
             GameObject createFlowBtn = GameObject.Find("CreateFlowButton");
             createFlowBtn.transform.localScale = new Vector3(0, 0, 0);
 
@@ -179,6 +190,80 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 SceneManager.LoadScene(SceneBuildIndices[SceneIndex]);
             }
             */
+        }
+
+        // @steeve: move this to happen on startup of Unity App
+        // handle logistics of Vuforia studio
+        /// <summary>
+        /// Looks for Vuforia Studio Projects Directory, 
+        /// takes every project in there, and makes an object of the projects name, thingworxServer, url, and type (of Assembly)
+        /// Saves the list of json to a file called "animations" (looking @ you, Dylan)
+        /// </summary>
+        public async void setupVuforiaStudioLogistics()
+        {
+                string username = System.Environment.GetEnvironmentVariable("UserName");
+                string docDir = $"C:\\Users\\{username}\\Documents";
+                string challenge1Dir = $"{docDir}\\MAARS-C1";
+
+                string c1Dir = $"C:\\Users\\{username}\\Documents\\MAARS-C1\\";
+                string expDir = $"C:\\Users\\{username}\\Documents\\MAARS-C1\\Experiences";
+                string vuforiaProjectsDir = $"{docDir}\\VuforiaStudio\\Projects";
+
+
+            // dirs created if not already existing
+            System.IO.Directory.CreateDirectory(c1Dir);
+                System.IO.Directory.CreateDirectory(expDir);
+
+                // for each dir in vuforiaProjectsDir (except node_modules)
+                string[] subdirs = Directory.GetDirectories(vuforiaProjectsDir);
+                subdirs = subdirs.Where(x => !x.Contains("node_modules")).ToArray();
+
+                string assembliesJsonPath = $"{challenge1Dir}\\animations.json";
+
+                List<Experience> assemblyList = new List<Experience>();
+
+                foreach (string sub in subdirs)
+                {
+                    string json = File.ReadAllText($"{sub}\\appConfig.json");
+                    Experience tempExp = JsonUtility.FromJson<Experience>(json);
+                    tempExp.url = WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={tempExp.thingworxServer}/ExperienceService/content/projects/{tempExp.name}/index.html");
+                    tempExp.type = "Assembly";
+
+                    HttpClient client = new HttpClient();
+                    string body = $"{tempExp.name}:{JsonConvert.SerializeObject(tempExp)}";
+                    NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
+                    queryString.Add("name", tempExp.name);
+                    queryString.Add("url", tempExp.url);
+
+                    string url = "https://sharingservice20200308094713.azurewebsites.net/api/animations";
+
+                    // POST to API
+                    var response = await client.PostAsync(url, new StringContent(queryString.ToString()));
+                    //Debug.Log(response.StatusCode);
+                    // end POST
+
+                    assemblyList.Add(tempExp);
+                }
+
+                File.WriteAllText(assembliesJsonPath, JsonConvert.SerializeObject(assemblyList));
+            
+        }
+
+        /// <summary>
+        /// An experience can be of type Assembly or of type Route
+        /// A full walkthrough will be a list of Experiences (typically as list of JSON)
+        /// </summary>
+        public class Experience
+        {
+            public string name;
+            public string thingworxServer;
+            public string url;
+            public string type;
+
+            override public string ToString()
+            {
+                return $"name: {this.name}\ntype:{this.type}\nurl:{this.url}";
+            }
         }
     }
 }
