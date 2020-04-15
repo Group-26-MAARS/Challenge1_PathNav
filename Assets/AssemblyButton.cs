@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using System.Collections.Specialized;
 using System.Web;
 using Microsoft.Azure.SpatialAnchors.Unity.Examples;
+using UnityEngine.SceneManagement;
+
 
 public class AssemblyButton : MonoBehaviour
 {
@@ -180,7 +182,8 @@ public class AssemblyButton : MonoBehaviour
                 string json = File.ReadAllText($"{sub}\\appConfig.json");
                 Experience tmpExperience = new Experience();
                 ExperienceAnimation animationExperience = JsonUtility.FromJson<ExperienceAnimation>(json);
-                animationExperience.setURL(WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={animationExperience.getThingWorxServer()}/ExperienceService/content/projects/{animationExperience.getName()}/index.html"));
+                animationExperience.
+                    setURL(WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={animationExperience.getThingWorxServer()}/ExperienceService/content/projects/{animationExperience.getName()}/index.html"));
                 tmpExperience.setType("Assembly");
 
                 HttpClient client = new HttpClient();
@@ -232,6 +235,11 @@ public class AssemblyButton : MonoBehaviour
         }
 
     }
+    /// <summary>
+    /// Creates object of class ExperienceRoute, populates with data from API and adds it to experienceItems queue
+    /// </summary>
+    /// <param name="currExperience">A pointer the experience item that is added to the list of experiences</param>
+    /// <param name="currRouteStr">The current route string from the API for this route</param>
     public void addRouteExperience(Experience currExperience, string currRouteStr)
     {
         int anchorCount = 0;
@@ -257,7 +265,12 @@ public class AssemblyButton : MonoBehaviour
         experienceItems.Add(currExperience);
     }
 
-    public async void addAnimationExperience(Experience currExperienceItem, string currAnimationStr)
+    /// <summary>
+    /// Creates object of class ExperienceAnimation, populates with data from API and adds it to experienceItems queue
+    /// </summary>
+    /// <param name="currExperienceItem">A pointer the experience item that is added to the list of experiences</param>
+    /// <param name="currAnimationStr">The current animation string from the API for this animation</param>
+    public void addAnimationExperience(Experience currExperienceItem, string currAnimationStr)
     {
         ExperienceAnimation animationExperience = new ExperienceAnimation();
         animationExperience = JsonConvert.DeserializeObject<ExperienceAnimation>(currAnimationStr.Split(new char[] {'~'})[1]);
@@ -265,11 +278,19 @@ public class AssemblyButton : MonoBehaviour
         currExperienceItem.setType("Assembly");
         experienceItems.Add(currExperienceItem);
     }
+
+    /// <summary>
+    /// Initializes list of experience items. Each item is an object of class ExperienceAnimation or
+    /// ExperienceRoute.
+    /// </summary>
+    /// <param name="experienceName">The selected experience from the combobox</param>
+
     public async void initializeExperienceItems(string experienceName)
     {
         // Get Experience from API
         HttpClient client = new HttpClient();
-        string allExperienceText = await client.GetStringAsync("https://sharingservice20200308094713.azurewebsites.net" + "/api/experiences/allassociated/" + experienceName);
+        string allExperienceText = await client.GetStringAsync("https://sharingservice20200308094713.azurewebsites.net" + 
+            "/api/experiences/allassociated/" + experienceName);
         Console.Write(allExperienceText);
 
         int nbrExperienceItems = allExperienceText.Split('&').Length;
@@ -290,21 +311,33 @@ public class AssemblyButton : MonoBehaviour
             // Add Experience Object to list
         }
     }
+
+    /// <summary>
+    /// Pulls and runs next experience item from experienceItems
+    /// </summary>
     public void pullAndRunNextExpItem()
     {
         Experience currExp = new Experience();
         currExp = experienceItems[0];
-        experienceItems.RemoveAt(0);
-        if (currExp.getType() == "Route")
+        if (currExp != null)
         {
-            HandleRoute(currExp.route);
-        }
-        else if(currExp.getType() == "Assembly")
-        {
-            HandleAssembly(currExp.animation);
+            experienceItems.RemoveAt(0);
+            if (currExp.getType() == "Route")
+            {
+                HandleRoute(currExp.route);
+            }
+            else if (currExp.getType() == "Assembly")
+            {
+                HandleAssembly(currExp.animation);
+            }
         }
 
     }
+
+    /// <summary>
+    /// Initializes Experience list items and creates a queue to pull from then pulls first item
+    /// </summary>
+    /// @dylan: Should show some window indicating to the user that the experience is complete
     public void runSelectedExperience()
     {
         string experienceName = "MyExperienceName"; // Will need to get this from combobox
@@ -314,6 +347,12 @@ public class AssemblyButton : MonoBehaviour
         if (experienceItems.Count > 0)
         {
             pullAndRunNextExpItem();
+        }
+        else
+        {
+            // Should show some window indicating to the user that the Experience is complete
+            // Launch Main Menu
+            SceneManager.LoadScene("Challenge1MainMenu");
         }
     }
 
@@ -373,15 +412,18 @@ public class AssemblyButton : MonoBehaviour
         //        Debug.Log($"{pair.Key}: {pair.Value}");
         //    }
         // Add Anchors for the route
-        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().initializeAnchorKeyList();
+        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
+            initializeAnchorKeyList();
 
         foreach (ExperienceAnchor anchorExp in exp.getAnchors())
         {
-            GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().addAnchorKeyToFind(anchorExp.getAnchorName());
+            GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
+                addAnchorKeyToFind(anchorExp.getAnchorName());
         }
 
         // Run 
-        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().searchAndBeginNav();
+        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
+            searchAndBeginNav();
     }
 
     public static string GetOS()
