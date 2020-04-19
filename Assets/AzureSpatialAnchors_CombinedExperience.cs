@@ -40,6 +40,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             CreateFlow = 0,
             LocateFlow
         }
+        public int getNbrDestAnchors()
+        {
+            return this.nbrOfDestinationAnchors;
+        }
+        public void setNbrOfDestAnchors(int nbrDest)
+        {
+            this.nbrOfDestinationAnchors = nbrDest;
+        }
         public void addAnchorKeyToFind(string anchorKey)
         {
             _anchorKeyToFind.Add(anchorKey);
@@ -116,11 +124,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 }
             }
         }
-        public int getNbrDestAnchors()
-        {
-            return nbrOfDestinationAnchors;
-        }
-
         protected override void OnCloudAnchorLocated(AnchorLocatedEventArgs args)
         {
             base.OnCloudAnchorLocated(args);
@@ -168,7 +171,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     otherSpawnedObjects.Add(nextObject);
                     Debug.Log("Adding " + nextObject);
 
-                    if (anchorsLocated >= nbrOfDestinationAnchors)
+                    if (anchorsLocated >= this.getNbrDestAnchors())
                     {
                         currentAppState = AppState.DemoStepStopSessionForQuery;
                     }
@@ -257,6 +260,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             //    InitializeLocateFlowDemo();
 
         }
+
         public void initializeAnchorKeyList()
         {
             _anchorKeyToFind = new List<string>();
@@ -266,6 +270,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         {
             // Initialize list of anchors to find
             InitializeLocateFlowDemo();
+
             beginNav();
         }
         public void searchOrBeginNav()
@@ -508,62 +513,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             }
             else if (currentAppState == AppState.DemoStepInputAnchorNumber)
             {
-                string anchorName;
-                // string inputText = XRUXPickerForMainMenu.Instance.GetDemoInputField().text;
-
-                // _anchorNumberToFind = anchorName;
-                // This is where I need to change _anchorKeyToFind to a list and cycle through all rowKeys (of interest. Statically set for now) and add them to _anchorKeyToFindList
-                // For now it will ignore user's actual input
-                _anchorNameToFind = new List<string>();
-                _anchorKeyToFind = new List<String>();
-
-                // Add rowkeys
                 // Get list of Anchors to add from the Anchor List UI
                 if ((GameObject.Find("Content") == null) || (GameObject.Find("Content").transform == null))
                     Debug.Log("Null in initlocateflowasync at (0)");
                 Transform anchorListTransform = GameObject.Find("Content").transform;
 
-                nbrOfDestinationAnchors = 0;
-                // Now adding directly to the list containing the anchor keys, not the rows. 
-                //_anchorNumberToFind.Add(24); // Add first flag
-                //_anchorNumberToFind.Add(25); // Add second flag
-
-                Debug.LogError("added anchors to the list that need to be searched");
-
-                // Add anchor keys
-#if !UNITY_EDITOR
-                    Debug.Log("ONLY ADDING 2 ANCHORS TO SEARCH FOR !!***********************************************************************************!!");
-
-                    // Now adding directly to the list containing the anchor keys, not the rows. 
-                    //string currentAnchorKey = await anchorExchanger.RetrieveAnchorKey(_anchorNameToFind[i]);
-                    
-                int i = 0;
-                    foreach (Transform child in anchorListTransform)
-                    {
-                        if (((child.Find("Toggle" + i).GetComponent<Toggle>().isOn == true) && child.Find("Toggle" + i)) && (child.Find("Toggle" + i).Find("AnchorContainer").gameObject.transform.childCount > 0))
-                        {
-                                    Debug.Log("In initlocateflowasync, made it to (1)");
-
-                            // First need to check if actually selected (above)
-                            try
-                            {
-                // This will not be called in CombinedExperience
-                               // _anchorKeyToFind
-                               // _anchorKeyToFind.Add(child.Find("Toggle" + i).Find("AnchorContainer").gameObject.transform.GetChild(0).name);
-                                //                    Debug.Log("In initlocateflowasync, made it to (2)");
-
-                            }
-                            catch(Exception)
-                            {
-                                Debug.Log("bad value was attempted to be added to _anchorKeyToFind. value was " + (currentAnchorKey != "" ? currentAnchorKey : ""));
-                            }
-                            nbrOfDestinationAnchors++;
-                        }
-                        i++;
-                    }
-#endif
-
-                //_anchorKeyToFind = await anchorExchanger.RetrieveAnchorKey(_anchorNameToFind.Value);
                 if (_anchorKeyToFind == null)
                 {
                     if (feedbackBox == null)
@@ -573,10 +527,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 else
                 {
                     _currentDemoFlow = DemoFlow.LocateFlow;
-                    //currentAppState = AppState.DemoStepCreateSession;
                     currentAppState = AppState.DemoStepCreateSessionForQuery;
-                    //   XRUXPickerForMainMenu.Instance.GetDemoInputField().text = "";
-
 
                     // Just added this:
                     Debug.Log("Going into AdvanceLocateFlowDemoAsync()");
@@ -813,10 +764,10 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     anchorsToFind.Add(_anchorKeyToFind[i]);
             }
             {
-                Debug.Log("*********************************** number of expected anchors is " + nbrOfDestinationAnchors);
+                Debug.Log("*********************************** number of expected anchors is " + this.getNbrDestAnchors());
 
                 //anchorsExpected = anchorsToFind.Count;
-                anchorsExpected = nbrOfDestinationAnchors;
+                anchorsExpected = this.getNbrDestAnchors();
 
                 SetAnchorIdsToLocate(anchorsToFind);
 

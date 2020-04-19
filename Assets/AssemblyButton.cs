@@ -142,8 +142,7 @@ public class AssemblyButton : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        experienceItems = new List<Experience>();
-
+        this.experienceItems = new List<Experience>();
     }
 
     // Update is called once per frame
@@ -262,7 +261,7 @@ public class AssemblyButton : MonoBehaviour
         currRoute.setAnchors(tempAnchorList);
         currExperience.setType("Route");
         currExperience.route = currRoute;
-        experienceItems.Add(currExperience);
+        this.experienceItems.Add(currExperience);
     }
 
     /// <summary>
@@ -276,7 +275,7 @@ public class AssemblyButton : MonoBehaviour
         animationExperience = JsonConvert.DeserializeObject<ExperienceAnimation>(currAnimationStr.Split(new char[] {'~'})[1]);
         currExperienceItem.animation = animationExperience;
         currExperienceItem.setType("Assembly");
-        experienceItems.Add(currExperienceItem);
+        this.experienceItems.Add(currExperienceItem);
     }
 
     /// <summary>
@@ -285,7 +284,7 @@ public class AssemblyButton : MonoBehaviour
     /// </summary>
     /// <param name="experienceName">The selected experience from the combobox</param>
 
-    public async void initializeExperienceItems(string experienceName)
+    public async Task initializeExperienceItems(string experienceName)
     {
         // Get Experience from API
         HttpClient client = new HttpClient();
@@ -338,15 +337,18 @@ public class AssemblyButton : MonoBehaviour
     /// Initializes Experience list items and creates a queue to pull from then pulls first item
     /// </summary>
     /// @dylan: Should show some window indicating to the user that the experience is complete
-    public void runSelectedExperience()
+    public async void runSelectedExperience()
     {
         string experienceName = "MyExperienceName"; // Will need to get this from combobox
-        initializeExperienceItems(experienceName);
-
+        await initializeExperienceItems(experienceName);
+        int nbrItemsPulled = 0;
+         
         // Pull Experience type and run
         if (experienceItems.Count > 0)
         {
+
             pullAndRunNextExpItem();
+            GameObject.Find("RunText").GetComponent<UnityEngine.UI.Text>().text =  (++nbrItemsPulled).ToString();
         }
         else
         {
@@ -418,8 +420,9 @@ public class AssemblyButton : MonoBehaviour
         foreach (ExperienceAnchor anchorExp in exp.getAnchors())
         {
             GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
-                addAnchorKeyToFind(anchorExp.getAnchorName());
+                addAnchorKeyToFind(anchorExp.getAnchorData());
         }
+        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().setNbrOfDestAnchors(exp.getAnchors().Count);
 
         // Run 
         GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().

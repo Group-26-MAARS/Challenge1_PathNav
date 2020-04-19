@@ -165,7 +165,7 @@ PlayerSettings:
   buildNumber:
     iPhone: 1.2.2
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 26
+  AndroidMinSdkVersion: 25
   AndroidTargetSdkVersion: 0
   AndroidPreferredInstallLocation: 1
   aotOptions: 
