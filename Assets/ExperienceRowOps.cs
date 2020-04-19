@@ -62,13 +62,13 @@ public class ExperienceRowOps : MonoBehaviour
          "18 : adba96bc-6887-424b-998b-b7fd3b21e968",
          "19 : 6e4d2638-1cf2-4a5f-a22f-1914d9653798"};
          */
-
+          
         for (int i = 0; i < experiencesFromAPI.Length; i++)
         {
             GameObject currentRow = Instantiate(experienceDisplayRow);
             currentRow.transform.SetParent(transform);
             currentRow.name = "AnchorDisplayRow" + i;
-           // currentRow.transform.localScale = new Vector3((float)0.35, (float)0.1005, (float)1);
+            currentRow.transform.localScale = new Vector3((float)0.35, (float)0.1005, (float)1);
 
             // Name the Labels (set as RowKey)
             currentRow.transform.Find("Label").GetComponent<UnityEngine.UI.Text>().text = experiencesFromAPI[i];
@@ -91,5 +91,5 @@ public class ExperienceRowOps : MonoBehaviour
         {
 
         }
-    }
+        }
 }

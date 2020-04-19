@@ -154,6 +154,9 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     GameObject nextObject = SpawnNewAnchoredObject(anchorPose.position, anchorPose.rotation, currentCloudAnchor);
                     //spawnedObjectMat = nextObject.GetComponent<MeshRenderer>().material;
                     Debug.Log("Setting goal in shareddemo");
+                    // Will only begin if it hasn't yet started.
+
+
 
                     //GameObject.Find("arrow").GetComponent<moveTo>().setGoal(nextObject.transform, nextObject.name);
 
@@ -162,6 +165,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     //Instead of setting anchor is up as destination, add the game object to the flag list for later use
                     GameObject.Find("listOfFlagsGameObj_CombinedExperience").GetComponent<ListOps>().addFlag(nextObject);
                     Debug.Log("********************************************added next Object: " + nextObject.transform.position + ". Main camera's location is " + Camera.main.transform.position + ". other position is " + GameObject.Find("CameraParent").transform.position);
+                    beginNav();
 
                     // Only start navigation if there are destination flags
 
@@ -266,12 +270,11 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             _anchorKeyToFind = new List<string>();
 
         }
-        public void searchAndBeginNav()
+        public async Task searchAndBeginNav()
         {
+            navigationStarted = false;
             // Initialize list of anchors to find
-            InitializeLocateFlowDemo();
-
-            beginNav();
+            await InitializeLocateFlowDemo();
         }
         public void searchOrBeginNav()
         {
@@ -546,7 +549,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// This version only exists for Unity to wire up a button click to.
         /// If calling from code, please use the Async version above.
         /// </summary>
-        public async void InitializeLocateFlowDemo()
+        public async Task InitializeLocateFlowDemo()
         {
             Debug.LogError("made it inside InitializeLocateFlowDemo()");
 
@@ -681,71 +684,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         private void EnableCorrectUIControls()
         {
-            /*
-            Debug.Log("Buttons labels are the following" + XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].name + ", " + XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].name +
-                XRUXPickerForMainMenu.Instance.GetDemoButtons()[2].name);
-            if (currentAppState == null)
-                Debug.Log("in EnableCorrectUIControls(), currentAppState is null");
-            else
-                Debug.Log("in EnableCorrectUIControls(), currentAppState is " + currentAppState);
-            // if (XRUXPickerForMainMenu == null)
-            //    Debug.Log("********************************XRUXPickerForMainMenu is null!!****************************");
-            if (XRUXPickerForMainMenu.Instance == null)
-              Debug.Log("********************************XRUXPickerForMainMenu.Instance is " + XRUXPickerForMainMenu.Instance);
-
-
-            if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[0] == null)
-            {
-                Debug.Log("********************************first button is null!!****************************");
-            }
-            if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[1] == null)
-            {
-                Debug.Log("********************************2nd button is null!!****************************");
-            }
-
-            switch (currentAppState)
-            {
-                case AppState.DemoStepChooseFlow:
-
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject.SetActive(true);
-#if UNITY_WSA
-                    XRUXPickerForMainMenu.Instance.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.1f;
-                    XRUXPickerForMainMenu.Instance.transform.LookAt(Camera.main.transform);
-                    XRUXPickerForMainMenu.Instance.transform.Rotate(Vector3.up, 180);
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(true);
-#else
-              //      XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].transform.Find("Text").GetComponent<Text>().text = "Create & Share Anchor";
-#endif
-                    XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject.SetActive(false);
-                    break;
-                case AppState.DemoStepInputAnchorNumber:
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject.SetActive(true);
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(false);
-                    XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject.SetActive(true);
-                    break;
-                default:
-                    if (XRUXPickerForMainMenu.Instance.GetDemoButtons() == null)
-                        Debug.Log("XRUXPickerForMainMenu.Instance.GetDemoButtons() is null");
-                    else if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[1] == null)
-                        Debug.Log("XRUXPickerForMainMenu.Instance.GetDemoButtons()[1] is null");
-                    else if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject == null)
-                        Debug.Log("XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject is null");
-                    else
-                        XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject.SetActive(false);
-#if UNITY_WSA
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(false);
-#else
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(true);
-
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].transform.Find("Text").GetComponent<Text>().text = "Next Step";
-                    #endif
-                    if ((XRUXPickerForMainMenu.Instance.GetDemoInputField() == null) || (XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject == null))
-                        Debug.Log("XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject is null");
-                    else
-                        XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject.SetActive(false); // "enter cloud anchor session for query.."
-                    break;
-            }
-            */
 
         }
 

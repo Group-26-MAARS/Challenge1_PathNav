@@ -151,69 +151,15 @@ public class AssemblyButton : MonoBehaviour
 
     }
 
-    // @steeve: move this to happen on startup of Unity App
-    // handle logistics of Vuforia studio
-    /// <summary>
-    /// Looks for Vuforia Studio Projects Directory, 
-    /// takes every project in there, and makes an object of the projects name, thingworxServer, url, and type (of Assembly)
-    /// Saves the list of json to a file called "animations" (looking @ you, Dylan)
-    /// </summary>
-    public async Task setupVuforiaStudioLogistics()
-    {
-        if (GetOS() == "WIN")
-        {
-            string username = System.Environment.GetEnvironmentVariable("UserName");
-            string docDir = $"C:\\Users\\{username}\\Documents";
-            string challenge1Dir = $"{docDir}\\MAARS-C1";
-            string expDir = $"{challenge1Dir}\\Experiences";
-            string vuforiaProjectsDir = $"{docDir}\\VuforiaStudio\\Projects";
-
-            // for each dir in vuforiaProjectsDir (except node_modules)
-            string[] subdirs = Directory.GetDirectories(vuforiaProjectsDir);
-            subdirs = subdirs.Where(x => !x.Contains("node_modules")).ToArray();
-
-            string assembliesJsonPath = $"{challenge1Dir}\\animations.json";
-
-            List<Experience> assemblyList = new List<Experience>();
-
-            foreach (string sub in subdirs)
-            {
-                string json = File.ReadAllText($"{sub}\\appConfig.json");
-                Experience tmpExperience = new Experience();
-                ExperienceAnimation animationExperience = JsonUtility.FromJson<ExperienceAnimation>(json);
-                animationExperience.
-                    setURL(WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={animationExperience.getThingWorxServer()}/ExperienceService/content/projects/{animationExperience.getName()}/index.html"));
-                tmpExperience.setType("Assembly");
-
-                HttpClient client = new HttpClient();
-                string body = $"{animationExperience.getName()}:{JsonConvert.SerializeObject(animationExperience)}";
-                NameValueCollection queryString = HttpUtility.ParseQueryString(string.Empty);
-                queryString.Add("name", animationExperience.getName());
-                queryString.Add("url", animationExperience.getURL());
-
-                string url = "https://sharingservice20200308094713.azurewebsites.net/api/animations";
-
-                // POST to API
-                var response = await client.PostAsync(url, new StringContent(queryString.ToString()));
-                //Debug.Log(response.StatusCode);
-                // end POST
-                tmpExperience.animation = animationExperience;
-                assemblyList.Add(tmpExperience);
-            }
-
-            File.WriteAllText(assembliesJsonPath, JsonConvert.SerializeObject(assemblyList));
-        }
-    }
-
     /// <summary>
     /// Opens up a file browser so user can select the Experience they want
     /// Also calls runExperience()
     /// </summary>
     public async void selectProcedure()
     {
+        /*
         if (GetOS() == "WIN")
         {
-            await setupVuforiaStudioLogistics();
             string username = System.Environment.GetEnvironmentVariable("UserName");
 
             string c1Dir = $"C:\\Users\\{username}\\Documents\\MAARS-C1\\";
@@ -232,7 +178,7 @@ public class AssemblyButton : MonoBehaviour
         {
 
         }
-
+        */
     }
     /// <summary>
     /// Creates object of class ExperienceRoute, populates with data from API and adds it to experienceItems queue
@@ -314,7 +260,7 @@ public class AssemblyButton : MonoBehaviour
     /// <summary>
     /// Pulls and runs next experience item from experienceItems
     /// </summary>
-    public void pullAndRunNextExpItem()
+    public async Task pullAndRunNextExpItem()
     {
         Experience currExp = new Experience();
         currExp = experienceItems[0];
@@ -323,11 +269,11 @@ public class AssemblyButton : MonoBehaviour
             experienceItems.RemoveAt(0);
             if (currExp.getType() == "Route")
             {
-                HandleRoute(currExp.route);
+                await HandleRoute(currExp.route);
             }
             else if (currExp.getType() == "Assembly")
             {
-                HandleAssembly(currExp.animation);
+                await HandleAssembly(currExp.animation);
             }
         }
 
@@ -347,7 +293,7 @@ public class AssemblyButton : MonoBehaviour
         if (experienceItems.Count > 0)
         {
 
-            pullAndRunNextExpItem();
+            await pullAndRunNextExpItem();
             GameObject.Find("RunText").GetComponent<UnityEngine.UI.Text>().text =  (++nbrItemsPulled).ToString();
         }
         else
@@ -393,10 +339,12 @@ public class AssemblyButton : MonoBehaviour
     /// <param name="exp">The Experience representing the Assembly </param>
     /// @steeve: Need to find some way of determing whether user is "done" w/ Assembly
     /// (possibly when the process ends?)
-    public void HandleAssembly(ExperienceAnimation exp)
+    public async Task HandleAssembly(ExperienceAnimation exp)
     {
         //Debug.Log(exp);
-        Application.OpenURL(exp.getURL());
+        string encoded = WebUtility.UrlDecode(exp.getURL());
+        Application.OpenURL(encoded);
+        await pullAndRunNextExpItem();
     }
 
     /// <summary>
@@ -405,7 +353,7 @@ public class AssemblyButton : MonoBehaviour
     /// </summary>
     /// <param name="exp"></param>
     /// @steeve: Connect w/ Dylan to see where that functionality is and call into it.
-    public void HandleRoute(ExperienceRoute exp)
+    public async Task HandleRoute(ExperienceRoute exp)
     {
         //    Newtonsoft.Json.Linq.JObject parsed = Newtonsoft.Json.Linq.JObject.Parse(json);
 
@@ -425,8 +373,8 @@ public class AssemblyButton : MonoBehaviour
         GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().setNbrOfDestAnchors(exp.getAnchors().Count);
 
         // Run 
-        GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
-            searchAndBeginNav();
+        await GameObject.Find("AzureSpatialAnchors").GetComponent<AzureSpatialAnchors_CombinedExperience>().
+           searchAndBeginNav();
     }
 
     public static string GetOS()
