@@ -182,7 +182,7 @@ public class AssemblyButton : MonoBehaviour
                 Experience tmpExperience = new Experience();
                 ExperienceAnimation animationExperience = JsonUtility.FromJson<ExperienceAnimation>(json);
                 animationExperience.
-                    setURL(WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={animationExperience.getThingWorxServer()}/ExperienceService/content/projects/{animationExperience.getName()}/index.html"));
+                    setURL(($"https://view.vuforia.com/command/view-experience?url={animationExperience.getThingWorxServer()}/ExperienceService/content/projects/{animationExperience.getName()}/index.html"));
                 tmpExperience.setType("Assembly");
 
                 HttpClient client = new HttpClient();
@@ -397,6 +397,7 @@ public class AssemblyButton : MonoBehaviour
     {
         //Debug.Log(exp);
         Application.OpenURL(exp.getURL());
+        pullAndRunNextExpItem();
     }
 
     /// <summary>

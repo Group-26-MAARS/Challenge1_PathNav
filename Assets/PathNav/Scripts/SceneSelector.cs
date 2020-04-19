@@ -45,7 +45,6 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         async void Start()
 #pragma warning restore CS1998
         {
-            setupVuforiaStudioLogistics();
             GameObject createFlowBtn = GameObject.Find("CreateFlowButton");
             createFlowBtn.transform.localScale = new Vector3(0, 0, 0);
 
@@ -178,6 +177,8 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
 
         public void loadCombinedExperience()
         {
+            Debug.Log("Hello");
+            setupVuforiaStudioLogistics();
             SceneManager.LoadScene("CombinedExperience");
         }
 
@@ -201,6 +202,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         /// </summary>
         public async void setupVuforiaStudioLogistics()
         {
+            Debug.Log("uhhh");
                 string username = System.Environment.GetEnvironmentVariable("UserName");
                 string docDir = $"C:\\Users\\{username}\\Documents";
                 string challenge1Dir = $"{docDir}\\MAARS-C1";
@@ -226,7 +228,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                 {
                     string json = File.ReadAllText($"{sub}\\appConfig.json");
                     Experience tempExp = JsonUtility.FromJson<Experience>(json);
-                    tempExp.url = WebUtility.UrlEncode($"https://view.vuforia.com/command/view-experience?url={tempExp.thingworxServer}/ExperienceService/content/projects/{tempExp.name}/index.html");
+                    tempExp.url = $"https://view.vuforia.com/command/view-experience?url={tempExp.thingworxServer}/ExperienceService/content/projects/{tempExp.name}/index.html";
                     tempExp.type = "Assembly";
 
                     HttpClient client = new HttpClient();
