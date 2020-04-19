@@ -71,7 +71,7 @@ public class ExperienceRowOps : MonoBehaviour
             currentRow.transform.localScale = new Vector3((float)0.35, (float)0.1005, (float)1);
 
             // Name the Labels (set as RowKey)
-            currentRow.transform.Find("Label").GetComponent<UnityEngine.UI.Text>().text = experiencesFromAPI[i];
+            currentRow.transform.GetChild(1).GetComponent<UnityEngine.UI.Text>().text = experiencesFromAPI[i];
             currentRow.SetActive(true);
 
             UnityEngine.UI.Button selectorBtn = currentRow.transform.Find("ExperienceSelectBtn").GetComponent<UnityEngine.UI.Button>();
@@ -89,7 +89,11 @@ public class ExperienceRowOps : MonoBehaviour
         }
         void ExperienceSelectorClicked(GameObject currentRow)
         {
+            Transform labelGameObj = currentRow.transform.GetChild(1);
+
+            GameObject.Find("ExperienceController").GetComponent<AssemblyButton>().
+                runSelectedExperience(labelGameObj.GetComponent<UnityEngine.UI.Text>().text);
 
         }
-        }
+    }
 }

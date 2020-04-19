@@ -283,16 +283,15 @@ public class AssemblyButton : MonoBehaviour
     /// Initializes Experience list items and creates a queue to pull from then pulls first item
     /// </summary>
     /// @dylan: Should show some window indicating to the user that the experience is complete
-    public async void runSelectedExperience()
+    public async void runSelectedExperience(string expName)
     {
-        string experienceName = "MyExperienceName"; // Will need to get this from combobox
-        await initializeExperienceItems(experienceName);
+        //string expName = "MyExperienceName"; // Will need to get this from combobox
+        await initializeExperienceItems(expName);
         int nbrItemsPulled = 0;
          
         // Pull Experience type and run
         if (experienceItems.Count > 0)
         {
-
             await pullAndRunNextExpItem();
             GameObject.Find("RunText").GetComponent<UnityEngine.UI.Text>().text =  (++nbrItemsPulled).ToString();
         }
@@ -331,6 +330,11 @@ public class AssemblyButton : MonoBehaviour
                     break;
             }
         }
+    }
+
+    public void specificExperienceClicked()
+    {
+
     }
 
     /// <summary>
