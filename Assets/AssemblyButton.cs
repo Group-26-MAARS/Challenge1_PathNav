@@ -396,7 +396,8 @@ public class AssemblyButton : MonoBehaviour
     public void HandleAssembly(ExperienceAnimation exp)
     {
         //Debug.Log(exp);
-        Application.OpenURL(exp.getURL());
+        string unencoded = WebUtility.UrlDecode(exp.getURL());
+        Application.OpenURL(unencoded);
         pullAndRunNextExpItem();
     }
 
