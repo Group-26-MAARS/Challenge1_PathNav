@@ -13,6 +13,8 @@ public class MoveTo : MonoBehaviour
 
     void Start()
     {
+        this.transform.localScale = new Vector3(0, 0, 0);
+
         NavMeshAgent agent = GetComponent<NavMeshAgent>();
         Debug.Log("NavMesh agent is created");
 
@@ -36,6 +38,8 @@ public class MoveTo : MonoBehaviour
             //var offset = transform.position - goal.transform.position; // Look at destination
             var offset = transform.position - goal.transform.position; // Look at destination
             transform.LookAt(transform.position + offset);
+            transform.Rotate(80, 0, 0);
+
         }
 
 

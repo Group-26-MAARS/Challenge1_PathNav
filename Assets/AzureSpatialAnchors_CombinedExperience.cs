@@ -80,7 +80,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         #region Member Variables
         private AppState _currentAppState = AppState.DemoStepChooseFlow;
         private DemoFlow _currentDemoFlow = DemoFlow.CreateFlow;
-        private readonly List<GameObject> otherSpawnedObjects = new List<GameObject>();
+        private List<GameObject> otherSpawnedObjects;
         private int anchorsLocated = 0;
         private int anchorsExpected = 0;
         private readonly List<string> localAnchorIds = new List<string>();
@@ -192,6 +192,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             if ((navigationStarted == false) && (GameObject.Find("listOfFlagsGameObj_CombinedExperience").GetComponent<ListOps>().flags.Count > 0))
             {
                 //if (GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().flags.Count == nbrOfDestinationAnchors)
+                GameObject.Find("arrow").transform.localScale = new Vector3(1, 1, 1);
                 GameObject.Find("CameraParent").GetComponent<CaptureDistance_CombinedExperience>().beginNavigation();
                 navigationStarted = true;
             }
@@ -268,6 +269,7 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
         public void initializeAnchorKeyList()
         {
             _anchorKeyToFind = new List<string>();
+            otherSpawnedObjects = new List<GameObject>();
 
         }
         public async Task searchAndBeginNav()
@@ -355,6 +357,14 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
             currentAppState = AppState.DemoStepCreateLocalAnchor;
             */
             await AdvanceCreateFlowDemoAsync();
+        }
+
+        public void clearRouteDataAndSession()
+        {
+            CleanupSpawnedObjects();
+            _anchorKeyToFind = null;
+            CloudManager.StopSession();
+
         }
 
         /// <summary>

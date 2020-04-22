@@ -101,10 +101,13 @@ public class CaptureDistance_CombinedExperience : MonoBehaviour
                     {
                         GameObject.Find("arrow").GetComponent<moveTo>().setGoal(null, "");
                         // Remove Arrow
-                        Destroy(GameObject.Find("arrow"));
-                        print("All goals have been reached in Path Navigation!");
-                        GameObject.Find("ExperienceController").GetComponent<AssemblyButton>().pullAndRunNextExpItem();
+                        GameObject.Find("arrow").transform.localScale = new Vector3((float).4, (float).4, (float).4);
 
+                        print("All goals have been reached in Path Navigation!");
+                        // Clear out Route Data and Session
+
+                        clearRouteData();
+                        pullNextItem();
                     }
 
                     // This is when next phase of Challenge 1 needs to be called
@@ -115,5 +118,15 @@ public class CaptureDistance_CombinedExperience : MonoBehaviour
             }
 
         }
+    }
+    public void clearRouteData()
+    {
+        GameObject.Find("AzureSpatialAnchors_CombinedExperience").GetComponent<AzureSpatialAnchors_CombinedExperience>().clearRouteDataAndSession();
+
+    }
+    public async void pullNextItem()
+    {
+        await GameObject.Find("ExperienceController").GetComponent<AssemblyButton>().pullAndRunNextExpItem();
+
     }
 }

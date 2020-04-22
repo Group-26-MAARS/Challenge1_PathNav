@@ -674,111 +674,13 @@ namespace Microsoft.Azure.SpatialAnchors.Unity.Examples
                     currentWatcher = CreateWatcher();
 
                     // DemoStepStopSessionForQuery is set automatically by the anchor located event handler
-
-                    /////////////////////
-
-
                     break;
 
-    /*
-                case AppState.DemoStepStartSessionForQuery:
-                    await CloudManager.StartSessionAsync();
-                    currentAppState = AppState.DemoStepLookForAnchor;
-                    break;
-                case AppState.DemoStepLookForAnchor:
-                    currentAppState = AppState.DemoStepLookingForAnchor;
-                    currentWatcher = CreateWatcher();
-                    break;
-                case AppState.DemoStepLookingForAnchor:
-                    // Advancement will take place when anchors have all been located.
-                    break;
-    *//*
-                case AppState.DemoStepStopSessionForQuery:
-                    CloudManager.StopSession();
-                    currentAppState = AppState.DemoStepComplete;
-                    break;
-   
-                case AppState.DemoStepComplete:
-                    currentCloudAnchor = null;
-                    currentWatcher = null;
-                    currentAppState = AppState.DemoStepChooseFlow;
-                    CleanupSpawnedObjects();
-                    break;
-                default:
-                    Debug.Log("Shouldn't get here for app state " + currentAppState);
-                    break;
-        */
             }
         }
 
         private void EnableCorrectUIControls()
         {
-            /*
-            Debug.Log("Buttons labels are the following" + XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].name + ", " + XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].name +
-                XRUXPickerForMainMenu.Instance.GetDemoButtons()[2].name);
-            if (currentAppState == null)
-                Debug.Log("in EnableCorrectUIControls(), currentAppState is null");
-            else
-                Debug.Log("in EnableCorrectUIControls(), currentAppState is " + currentAppState);
-            // if (XRUXPickerForMainMenu == null)
-            //    Debug.Log("********************************XRUXPickerForMainMenu is null!!****************************");
-            if (XRUXPickerForMainMenu.Instance == null)
-              Debug.Log("********************************XRUXPickerForMainMenu.Instance is " + XRUXPickerForMainMenu.Instance);
-
-
-            if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[0] == null)
-            {
-                Debug.Log("********************************first button is null!!****************************");
-            }
-            if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[1] == null)
-            {
-                Debug.Log("********************************2nd button is null!!****************************");
-            }
-
-            switch (currentAppState)
-            {
-                case AppState.DemoStepChooseFlow:
-
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject.SetActive(true);
-#if UNITY_WSA
-                    XRUXPickerForMainMenu.Instance.transform.position = Camera.main.transform.position + Camera.main.transform.forward * 0.1f;
-                    XRUXPickerForMainMenu.Instance.transform.LookAt(Camera.main.transform);
-                    XRUXPickerForMainMenu.Instance.transform.Rotate(Vector3.up, 180);
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(true);
-#else
-              //      XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].transform.Find("Text").GetComponent<Text>().text = "Create & Share Anchor";
-#endif
-                    XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject.SetActive(false);
-                    break;
-                case AppState.DemoStepInputAnchorNumber:
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject.SetActive(true);
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(false);
-                    XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject.SetActive(true);
-                    break;
-                default:
-                    if (XRUXPickerForMainMenu.Instance.GetDemoButtons() == null)
-                        Debug.Log("XRUXPickerForMainMenu.Instance.GetDemoButtons() is null");
-                    else if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[1] == null)
-                        Debug.Log("XRUXPickerForMainMenu.Instance.GetDemoButtons()[1] is null");
-                    else if (XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject == null)
-                        Debug.Log("XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject is null");
-                    else
-                        XRUXPickerForMainMenu.Instance.GetDemoButtons()[1].gameObject.SetActive(false);
-#if UNITY_WSA
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(false);
-#else
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].gameObject.SetActive(true);
-
-                    XRUXPickerForMainMenu.Instance.GetDemoButtons()[0].transform.Find("Text").GetComponent<Text>().text = "Next Step";
-                    #endif
-                    if ((XRUXPickerForMainMenu.Instance.GetDemoInputField() == null) || (XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject == null))
-                        Debug.Log("XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject is null");
-                    else
-                        XRUXPickerForMainMenu.Instance.GetDemoInputField().gameObject.SetActive(false); // "enter cloud anchor session for query.."
-                    break;
-            }
-            */
-            
         }
 
         private void ConfigureSession()

@@ -58,6 +58,7 @@ public class CaptureDistance : MonoBehaviour
             {
                 GameObject myGameObject = GameObject.Find("listOfFlagsGameObj").GetComponent<ListOps>().getNext();
                 anchorsReceived++;
+                GameObject.Find("arrow").transform.localScale = new Vector3((float).4, (float).4, (float).4);
                 GameObject.Find("arrow").GetComponent<moveTo>().setGoal(myGameObject.transform, myGameObject.name);
             }
         }
